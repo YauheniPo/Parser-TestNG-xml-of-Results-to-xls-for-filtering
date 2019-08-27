@@ -43,12 +43,5 @@ jobs:
       targetPath: '$(System.DefaultWorkingDirectory)/jar'
       artifact: 'jar'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'jar'
-      publishLocation: 'FilePath'
-      TargetPath: '$(Pipeline.Workspace)/jar/parse_testng_results-1.0-SNAPSHOT-jar-with-dependencies.jar'
-  
   - script: ls
     displayName: $(vmImageVar) env
