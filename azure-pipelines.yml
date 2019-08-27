@@ -36,12 +36,12 @@ jobs:
       failTaskOnFailedTests: true
       publishRunAttachments: true
 
-  - template: artifacts.yml
+  # - template: artifacts.yml
 
-  - task: PublishPipelineArtifact@1
-    inputs:
-      targetPath: '$(Pipeline.Workspace)/jar'
-      artifact: 'parse_testng_results-1.0-SNAPSHOT-jar-with-dependencies.jar'
+  # - task: PublishPipelineArtifact@1
+  #   inputs:
+  #     targetPath: '$(System.DefaultWorkingDirectory)/jar'
+  #     artifact: 'parse_testng_results-1.0-SNAPSHOT-jar-with-dependencies.jar'
   - task: PublishBuildArtifacts@1
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
