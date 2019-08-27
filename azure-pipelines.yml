@@ -41,13 +41,8 @@ jobs:
   - task: PublishPipelineArtifact@1
     inputs:
       targetPath: '$(System.DefaultWorkingDirectory)/jar'
-      artifact: 'parse_testng_results-1.0-SNAPSHOT-jar-with-dependencies.jar'
+      artifact: 'jar'
 
-  - task: UniversalPackages@0
-    inputs:
-      command: 'download'
-      downloadDirectory: '$(System.DefaultWorkingDirectory)/jar'
-      feedsToUse: 'internal'
   - task: PublishBuildArtifacts@1
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
