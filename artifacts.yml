@@ -1,0 +1,11 @@
+steps:
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Build Artifacts
+    inputs:
+      PathtoPublish: '$(System.DefaultWorkingDirectory)'
+      ArtifactName: 'PublishBuildArtifacts'
+
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: 'PublishPipelineArtifact'
+      targetPath: '$(System.DefaultWorkingDirectory)'
