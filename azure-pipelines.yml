@@ -36,10 +36,6 @@ jobs:
       failTaskOnFailedTests: true
       publishRunAttachments: true
 
-  - task: cURLUploader@2
-    inputs:
-      files: '$(System.DefaultWorkingDirectory)/jar'
-      
   - template: artifacts.yml
 
   - task: PublishPipelineArtifact@1
