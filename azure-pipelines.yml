@@ -12,8 +12,6 @@ jobs:
 #    vmImage: 'macOS-10.13'
 
   steps:
-  - task: SonarCloudAnalyze@1
-
   - script: ls
     displayName: ls command
 
@@ -43,10 +41,6 @@ jobs:
       files: '$(System.DefaultWorkingDirectory)/jar'
       
   - template: artifacts.yml
-
-  - task: SonarCloudPublish@1
-    inputs:
-      pollingTimeoutSec: '1000'
 
   - task: PublishPipelineArtifact@1
     inputs:
