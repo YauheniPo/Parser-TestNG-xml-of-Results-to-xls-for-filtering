@@ -47,8 +47,5 @@ jobs:
       targetPath: '$(System.DefaultWorkingDirectory)/jar'
       artifact: 'jar'
 
- 
-  - task: SonarCloudQualityGateCheck@1
-
   - script: ls
     displayName: $(vmImageVar) env
