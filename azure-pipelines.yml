@@ -12,7 +12,6 @@ jobs:
 #    vmImage: 'macOS-10.13'
 
   steps:
-  - task: SonarCloudQualityGateCheck@1
   - task: SonarCloudAnalyze@1
 
   - script: ls
