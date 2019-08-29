@@ -24,6 +24,10 @@ public final class Browser {
         return instance;
     }
 
+    public static void openUrl(String url) {
+        getDriver().get(url);
+    }
+
     public static WebDriver getDriver() {
         if (driverHolder.get() == null) {
             driverHolder.set(getNewDriver());
