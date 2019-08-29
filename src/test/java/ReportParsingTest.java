@@ -4,6 +4,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
 
 public class ReportParsingTest {
@@ -19,7 +20,12 @@ public class ReportParsingTest {
         Browser.getInstance();
         Browser.openUrl(testReport);
         try {
-            this.reportParsedFile = RunTestNGResultsParserToXls.getXlsParsedReportFile(testReport, reportPage.getFailedTestsNames(), reportPage.getFailedTestsStacktraces());
+            List<String> failedTestsNames = reportPage.getFailedTestsNames();
+            List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktraces();
+            this.reportParsedFile = RunTestNGResultsParserToXls.getGenerateReportFile(testReport, failedTestsNames.size(),
+                    failedTestsStacktrace.size(), RunTestNGResultsParserToXls.EXCEL_EXTENSION);
+            RunTestNGResultsParserToXls.fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
+            RunTestNGResultsParserToXls.createFile(reportParsedFile);
         } catch (Exception e) {
             Browser.getInstance().exit();
             e.printStackTrace();
