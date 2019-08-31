@@ -1,7 +1,9 @@
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
+@Log4j2
 public class SummaryReport {
 
     public static Map<String, List<String>> groupingTestsFailed(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
@@ -40,6 +42,8 @@ public class SummaryReport {
                 return rowNum;
             }
         }
-        throw new RuntimeException(String.format("List does not contain '%s'.", expectString));
+        RuntimeException runtimeException = new RuntimeException(String.format("List does not contain '%s'.", expectString));
+        log.fatal(runtimeException);
+        throw runtimeException;
     }
 }

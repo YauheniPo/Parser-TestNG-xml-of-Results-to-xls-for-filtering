@@ -1,4 +1,5 @@
 import driver.Browser;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class RunTestNGResultsParserToXls {
 
     public static final String EXCEL_EXTENSION = "xlsx";
@@ -25,11 +27,17 @@ public class RunTestNGResultsParserToXls {
 
     public static void main(String[] args) {
         String message = null;
+        String reportTestNGPath;
         try {
-            JFileChooser jFileChooser = viewFileChooser();
-            File file = jFileChooser.getSelectedFile();
-            String reportTestNGPath = file.getAbsolutePath();
+            if (args.length == 0) {
+                JFileChooser jFileChooser = viewFileChooser();
+                File file = jFileChooser.getSelectedFile();
+                reportTestNGPath = file.getAbsolutePath();
+            } else {
+                reportTestNGPath = args[0];
+            }
 
+            log.info(String.format("Report file path: %s", reportTestNGPath));
             //открываем репорт в браузере и покируем путь из строки поиска или просто путь к файлу
 //            String reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\RegressionSuiteFull.html";
 
@@ -47,7 +55,9 @@ public class RunTestNGResultsParserToXls {
             message = String.format("Excel file PATH: %s", generateFile.getPath());
         } catch (Exception e) {
             message = e.getMessage();
+            log.error(e);
         } finally {
+            log.info(message);
             Browser.getInstance().exit();
             viewAlert(message);
         }
@@ -83,6 +93,7 @@ public class RunTestNGResultsParserToXls {
         try {
             return URLDecoder.decode(path, "UTF-8");
         } catch (UnsupportedEncodingException e) {
+            log.error(e);
             viewAlert(e.getMessage());
             e.printStackTrace();
         }
