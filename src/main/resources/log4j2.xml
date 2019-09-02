@@ -5,7 +5,7 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %p %c{1.} [%t] %-5level %logger{36} - %msg%n" />
         </Console>
 
-        <RollingFile name="File" fileName="jar_reports_logs/log.log" filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+        <RollingFile name="File" fileName="jar_reports_logs/log.log" filePattern="logs-backup/$${date:yyyy-MM}/logs-%d{MM-dd-yyyy}-%i.log.gz">
             <PatternLayout>
                 <Pattern>%d{HH:mm:ss.SSS} %p %c{1.} [%t] %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>

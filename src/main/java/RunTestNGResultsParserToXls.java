@@ -9,14 +9,15 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class RunTestNGResultsParserToXls {
@@ -24,22 +25,27 @@ public class RunTestNGResultsParserToXls {
     public static final String EXCEL_EXTENSION = "xlsx";
     private static final ReportPage reportPage = new ReportPage();
     private static XSSFWorkbook workbook = new XSSFWorkbook();
+    public static boolean isCommandRun = false;
 
     public static void main(String[] args) {
         String message = null;
         String reportTestNGPath;
+        File generateFile = null;
         try {
             if (args.length == 0) {
                 JFileChooser jFileChooser = viewFileChooser();
                 File file = jFileChooser.getSelectedFile();
+                //открываем репорт в браузере и покируем путь из строки поиска или просто путь к файлу
+                //закомментить
                 reportTestNGPath = file.getAbsolutePath();
+                //раскомментить
+//                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\emailable-report.html";
             } else {
+                isCommandRun = true;
                 reportTestNGPath = args[0];
             }
 
             log.info(String.format("Report file path: %s", reportTestNGPath));
-            //открываем репорт в браузере и покируем путь из строки поиска или просто путь к файлу
-//            String reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\RegressionSuiteFull.html";
 
             saveRemoteBasicReportFile(reportTestNGPath, getGenerateReportFile(getFileName(reportTestNGPath)).getAbsolutePath());
 
@@ -47,19 +53,31 @@ public class RunTestNGResultsParserToXls {
             Browser.openUrl(reportTestNGPath);
             List<String> failedTestsNames = reportPage.getFailedTestsNames();
             List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktraces();
-            File generateFile = getGenerateReportFile(reportTestNGPath, failedTestsNames.size(), failedTestsStacktrace.size(), EXCEL_EXTENSION);
+            generateFile = getGenerateReportFile(reportTestNGPath, failedTestsNames.size(), failedTestsStacktrace.size(), EXCEL_EXTENSION);
             fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
             Map<String, List<String>> reportSummary = SummaryReport.groupingTestsFailed(failedTestsNames, failedTestsStacktrace);
             fetchSummaryExcelSheet(reportSummary);
             createFile(generateFile);
             message = String.format("Excel file PATH: %s", generateFile.getPath());
         } catch (Exception e) {
-            message = e.getMessage();
+            message = Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()).toString();
             log.error(e);
         } finally {
             log.info(message);
             Browser.getInstance().exit();
             viewAlert(message);
+        }
+        openDesktopFile(generateFile);
+    }
+
+    private static void openDesktopFile(File generateFile) {
+        if (!isCommandRun && Objects.requireNonNull(generateFile).exists()) {
+            try {
+                Desktop.getDesktop().open(generateFile);
+            } catch (IOException e) {
+                log.error(e);
+                viewAlert(String.format("Open desktop file: %s", e.getMessage()));
+            }
         }
     }
 
@@ -70,7 +88,19 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static JFileChooser viewFileChooser() {
-        JFileChooser jFileChooser = new JFileChooser();
+        JFileChooser jFileChooser = new JFileChooser() {
+
+            @Override
+            protected JDialog createDialog(Component parent)
+                    throws HeadlessException {
+                JDialog dialog = super.createDialog(parent);
+                // config here as needed - just to see a difference
+                dialog.setLocationByPlatform(true);
+                // might help - can't know because I can't reproduce the problem
+                dialog.setAlwaysOnTop(true);
+                return dialog;
+            }
+        };
         jFileChooser.setDialogTitle("Choose a report");
         jFileChooser.setCurrentDirectory(new File(getDecodeAbsolutePath(getSourcePath())));
         jFileChooser.showOpenDialog(null);
