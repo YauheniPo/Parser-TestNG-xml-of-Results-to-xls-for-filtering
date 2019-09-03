@@ -1,7 +1,8 @@
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -32,22 +33,26 @@ public class SummaryReport {
         int testStringNum = getNumberString(failedTest, stackTraceStringsList);
         List<String> testStackTraceList = IntStream.range(0, testStringNum).mapToObj(stackTraceStringsList::get).collect(Collectors.toList());
         String testFailureMethod = getTestFailureMethod(new ArrayList<>(testStackTraceList));
-        String[] failedMethodArray = testFailureMethod.split("\\.");
-        String failedPage = failedMethodArray[failedMethodArray.length - 3];
-        String failedMethod = StringUtils.substringBeforeLast(failedMethodArray[failedMethodArray.length - 2], "(");
+        return getCommonFail(testFailureMethod);
+    }
 
-        return String.format("%s.%s", failedPage, failedMethod);
+    private static String getCommonFail(String stackTrace) {
+        Pattern r = Pattern.compile("\\.(\\w*.<?\\w*>?)\\(");
+        Matcher m = r.matcher(stackTrace);
+        m.find();
+        return m.group(1);
     }
 
     private static String getTestFailureMethod(List<String> testStackTraceList) {
-        List<String> stackTraceList = new ArrayList<>(testStackTraceList);
-        int stackTraceSize = stackTraceList.size();
-//        for (int i = 0; i < stackTraceSize; ++i) {
-//            if (!testStackTraceList.get(i).contains(".BaseTestPage.") || testStackTraceList.get(i).contains(" at com.mscs.emr.test.functional.g2.")) {
-//                return testStackTraceList.get(i);
-//            }
-//        }
-        return stackTraceList.get(stackTraceSize - 1);
+        int stackTraceSize = testStackTraceList.size();
+        for (int i = stackTraceSize - 1; 0 <= i; --i) {
+            String stackTraceLine = testStackTraceList.get(i);
+            if (i != 0 && (testStackTraceList.get(i - 1).contains(".BaseTestPage.") || !testStackTraceList.get(i - 1).startsWith(" at "))) {
+                return stackTraceLine;
+            }
+        }
+        log.debug(String.format("!!!   Debug StackTrace parsing:   !!!\n%s", testStackTraceList.toString()));
+        return testStackTraceList.get(stackTraceSize - 1);
     }
 
     private static int getNumberString(String expectString, List<String> list) {
@@ -57,7 +62,7 @@ public class SummaryReport {
             }
         }
         RuntimeException runtimeException = new RuntimeException(String.format("List does not contain '%s'.", expectString));
-        log.fatal(runtimeException);
+        log.error(runtimeException);
         throw runtimeException;
     }
 }

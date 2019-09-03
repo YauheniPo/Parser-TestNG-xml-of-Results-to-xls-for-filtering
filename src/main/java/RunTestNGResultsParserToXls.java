@@ -41,13 +41,20 @@ public class RunTestNGResultsParserToXls {
                 //раскомментить
 //                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\emailable-report.html";
             } else {
+                log.debug(String.format("args values: %s", Arrays.asList(args).toString()));
                 isCommandRun = true;
-                reportTestNGPath = args[0];
+                reportTestNGPath = getDecodeAbsolutePath(args[0]);
             }
 
-            log.info(String.format("Report file path: %s", reportTestNGPath));
+            log.info(String.format(">>>>>>   Report file path:   <<<<<<\n%s", reportTestNGPath));
 
-            saveRemoteBasicReportFile(reportTestNGPath, getGenerateReportFile(getFileName(reportTestNGPath)).getAbsolutePath());
+            try {
+                saveRemoteBasicReportFile(reportTestNGPath, getGenerateReportFile(getFileName(reportTestNGPath)).getAbsolutePath());
+            } catch (Exception e) {
+                String msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, e.getMessage());
+                log.error(msg);
+                viewAlert("File generation will continue after closing the window.\n" + msg);
+            }
 
             Browser.getInstance();
             Browser.openUrl(reportTestNGPath);
@@ -58,9 +65,9 @@ public class RunTestNGResultsParserToXls {
             Map<String, List<String>> reportSummary = SummaryReport.groupingTestsFailed(failedTestsNames, failedTestsStacktrace);
             fetchSummaryExcelSheet(reportSummary);
             createFile(generateFile);
-            message = String.format("Excel file PATH: %s", generateFile.getPath());
+            message = String.format("Excel file PATH:\n%s", generateFile.getPath());
         } catch (Exception e) {
-            message = Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList()).toString();
+            message = Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
             log.error(e);
         } finally {
             log.info(message);
