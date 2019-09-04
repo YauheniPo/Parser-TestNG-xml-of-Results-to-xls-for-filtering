@@ -116,7 +116,7 @@ public class RunTestNGResultsParserToXls {
             }
         };
         jFileChooser.setDialogTitle("Choose a report");
-        jFileChooser.setCurrentDirectory(new File(getDecodeAbsolutePath(getSourcePath())));
+        jFileChooser.setCurrentDirectory(new File(getSourcePath()));
         jFileChooser.showOpenDialog(null);
         return jFileChooser;
     }
@@ -132,7 +132,7 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static String getSourcePath() {
-        return RunTestNGResultsParserToXls.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        return getDecodeAbsolutePath(RunTestNGResultsParserToXls.class.getProtectionDomain().getCodeSource().getLocation().getPath());
     }
 
     public static String decode(String path) {
@@ -151,13 +151,23 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static void fetchSummaryExcelSheet(Map<String, List<String>> mapTests) {
-        List<String> failedMethods = new ArrayList<>(mapTests.keySet());
+        Map<String, List<String>> sortedMapTests = mapTests.entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getValue().size(), Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> {
+                            throw new AssertionError();
+                        },
+                        LinkedHashMap::new
+                ));
+        List<String> failedMethods = new ArrayList<>(sortedMapTests.keySet());
         List<String> countFailed = new ArrayList<>();
         List<String> columnTestsCells = new ArrayList<>();
         for (String failedMethod : failedMethods) {
             String columnTestsCell = "";
-            countFailed.add(String.valueOf(mapTests.get(failedMethod).size()));
-            List<String> testsList = mapTests.get(failedMethod);
+            countFailed.add(String.valueOf(sortedMapTests.get(failedMethod).size()));
+            List<String> testsList = sortedMapTests.get(failedMethod);
             for (String test : testsList) {
                 columnTestsCell = columnTestsCell.concat(test).concat("\r\n");
             }
@@ -179,11 +189,14 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static File getGenerateReportFile(String generateFileName) {
-        return new File(new File(getDecodeAbsolutePath(getSourcePath())).getParent() + File.separator + generateFileName);
+        return new File(getParentFilePath() + File.separator + generateFileName);
     }
 
     private static File getGenerateReportFile(String reportTestNGPath, int failedTestsNamesCount, int failedTestsStacktraceCount, String extension) {
-        return new File(new File(getDecodeAbsolutePath(getSourcePath())).getParent()
-                + File.separator + getGenerateReportFileName(reportTestNGPath, failedTestsNamesCount, failedTestsStacktraceCount, extension));
+        return new File(getParentFilePath() + File.separator + getGenerateReportFileName(reportTestNGPath, failedTestsNamesCount, failedTestsStacktraceCount, extension));
+    }
+
+    private static String getParentFilePath() {
+        return new File(getSourcePath()).getParent();
     }
 }
