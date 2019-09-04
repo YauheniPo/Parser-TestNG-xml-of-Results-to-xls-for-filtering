@@ -81,6 +81,32 @@ public class RunTestNGResultsParserToXls {
         return generateFile;
     }
 
+    public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName) {
+        File generateFile = new File(
+                getDecodeAbsolutePath(generateReportPath) + File.separator + generateReportName + "." + EXCEL_EXTENSION);
+        String message = null;
+        try {
+            Browser.getInstance();
+            Browser.openUrl(reportTestNGPath);
+            List<String> failedTestsNames = reportPage.getFailedTestsNames();
+            List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktraces();
+            fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
+            Map<String, List<String>> reportSummary = SummaryReport.groupingTestsFailed(failedTestsNames, failedTestsStacktrace);
+            fetchSummaryExcelSheet(reportSummary);
+            excelGenerator.createFile(generateFile);
+            message = String.format("Excel file PATH:\n%s", generateFile.getPath());
+        } catch (Exception e) {
+            message = Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
+            log.error(e);
+            e.printStackTrace();
+        } finally {
+            log.info(message);
+            Browser.getInstance().exit();
+            viewAlert(message);
+        }
+        return generateFile;
+    }
+
     private static void openDesktopFile(File generateFile) {
         if (isWindowRun && Objects.requireNonNull(generateFile).exists()) {
             try {
