@@ -45,14 +45,26 @@ public class SummaryReport {
         Pattern r = Pattern.compile("\\.(\\w*.<?\\w*>?)\\(");
         Matcher m = r.matcher(testFailureMethod);
         m.find();
-        return m.group(1);
+        try {
+            return m.group(1);
+        } catch (IllegalStateException e) {
+            String message = String.format("ERROR for matching of '%s' from stacktrace: %s", testFailureMethod, testStackTraceList.toString());
+            log.error(message);
+            RunTestNGResultsParserToXls.viewAlert(message);
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static String getTestFailureMethod(List<String> testStackTraceList) {
         int stackTraceSize = testStackTraceList.size();
         for (int i = stackTraceSize - 1; 0 <= i; --i) {
             String stackTraceLine = testStackTraceList.get(i);
-            if (i != 0 && (testStackTraceList.get(i - 1).contains(".BaseTestPage.") || !testStackTraceList.get(i - 1).startsWith(" at "))) {
+            if (i != 0
+                    &&
+                    (testStackTraceList.get(i - 1).contains(".BaseTestPage.")
+                            || (!testStackTraceList.get(i - 1).trim().startsWith("at ")
+                            && !testStackTraceList.get(i - 1).contains("java")))) {
                 return stackTraceLine;
             }
         }

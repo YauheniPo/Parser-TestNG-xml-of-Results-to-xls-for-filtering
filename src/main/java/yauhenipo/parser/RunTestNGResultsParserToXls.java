@@ -34,7 +34,7 @@ public class RunTestNGResultsParserToXls {
                 //закомментить
                 reportTestNGPath = file.getAbsolutePath();
                 //раскомментить
-//                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\report_20190904-071506_0a3a1069-a7ba-43a4-b295-7a365f4651bb.html";
+//                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\emailable-report.html";
             } else {
                 log.debug(String.format("args values: %s", Arrays.asList(args).toString()));
                 reportTestNGPath = getDecodeAbsolutePath(args[0]);
@@ -121,7 +121,7 @@ public class RunTestNGResultsParserToXls {
         return jFileChooser;
     }
 
-    private static void viewAlert(String message) {
+    static void viewAlert(String message) {
         if (isWindowRun) {
             JOptionPane.showMessageDialog(null, message);
         }
