@@ -1,10 +1,9 @@
-import driver.Browser;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import yauhenipo.parser.RunTestNGResultsParserToXls;
 
 import java.io.File;
-import java.util.List;
 import java.util.Objects;
 
 public class ReportParsingTest {
@@ -13,23 +12,10 @@ public class ReportParsingTest {
     private final String testReport = RunTestNGResultsParserToXls.getDecodeAbsolutePath(
             Objects.requireNonNull(ReportParsingTest.class.getClassLoader().getResource(TEST_REPORT_FILE_NAME)).getPath());
     private File reportParsedFile;
-    private static ReportPage reportPage = new ReportPage();
 
     @BeforeClass
     public void beforeClass() {
-        Browser.getInstance();
-        Browser.openUrl(testReport);
-        try {
-            List<String> failedTestsNames = reportPage.getFailedTestsNames();
-            List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktraces();
-            this.reportParsedFile = RunTestNGResultsParserToXls.getGenerateReportFile(testReport, failedTestsNames.size(),
-                    failedTestsStacktrace.size(), RunTestNGResultsParserToXls.EXCEL_EXTENSION);
-            RunTestNGResultsParserToXls.fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
-            RunTestNGResultsParserToXls.createFile(reportParsedFile);
-        } catch (Exception e) {
-            Browser.getInstance().exit();
-            e.printStackTrace();
-        }
+        reportParsedFile = RunTestNGResultsParserToXls.getGenerateExcelReportFile(testReport);
     }
 
     @Test

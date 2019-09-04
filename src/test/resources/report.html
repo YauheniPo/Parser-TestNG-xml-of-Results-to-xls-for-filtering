@@ -33,9 +33,12 @@ td,th {border:1px solid #009;padding:.25em .5em}
 <tr class="failedodd"><td>ReportParsingTest</td><td><a href="file://report.html#m1"><b>failedTest</b> (Active, Regression) ("Yauheni Papovich")</a></td><td class="numi">1</td><td>1565896549345</td><td class="numi">504157</td></tr>
 </tbody></table>
 <h1>RegressionSuiteFull</h1>
-<h2 id="m1">ReportParsingTest:failedTest</h2>
+<h2 id="m1">com.test.Test:failedTest</h2>
 <div>
-<div class="stacktrace">org.openqa.selenium.TimeoutException:</div>
+<div class="stacktrace">org.openqa.selenium.TimeoutException:
+    at com.pages.Page.click(Page.java:174)
+    at com.test.Test.failedTest(Test.java:1096)
+</div>
 </div>
 <p class="totop"><a href="file://report.html#summary">back to summary</a></p>
 <h2 id="m2">ReportParsingTest:passedTest</h2>
