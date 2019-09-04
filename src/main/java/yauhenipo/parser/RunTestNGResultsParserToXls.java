@@ -30,10 +30,7 @@ public class RunTestNGResultsParserToXls {
                 isWindowRun = true;
                 JFileChooser jFileChooser = viewFileChooser();
                 File file = jFileChooser.getSelectedFile();
-                //открываем репорт в браузере и покируем путь из строки поиска или просто путь к файлу
-                //закомментить
                 reportTestNGPath = file.getAbsolutePath();
-                //раскомментить
 //                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\emailable-report.html";
             } else {
                 log.debug(String.format("args values: %s", Arrays.asList(args).toString()));

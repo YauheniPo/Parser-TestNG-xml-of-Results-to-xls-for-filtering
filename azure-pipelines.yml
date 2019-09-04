@@ -24,7 +24,7 @@ jobs:
       jdkVersionOption: '1.8'
       jdkArchitectureOption: 'x64'
       publishJUnitResults: false
-      goals: 'clean test package -Dfile.encoding=UTF8 -Dmaven.wagon.http.pool=false'
+      goals: 'clean test package -Dmaven.wagon.http.pool=false'
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
