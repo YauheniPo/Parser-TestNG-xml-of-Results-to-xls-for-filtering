@@ -42,13 +42,13 @@ public class SummaryReport {
         if (testStackTraceList.size() == 1) {
             return testFailureMethod;
         }
-        Pattern r = Pattern.compile("\\.(\\w*.<?\\w*>?)\\(");
+        Pattern r = Pattern.compile("\\.(\\w*\\$?\\w*\\.((<?\\w*>?)|(\\w*\\$?\\w*\\$?\\d*?)))\\(");
         Matcher m = r.matcher(testFailureMethod);
         m.find();
         try {
             return m.group(1);
         } catch (IllegalStateException e) {
-            String message = String.format("ERROR for matching of '%s' from stacktrace: %s", testFailureMethod, testStackTraceList.toString());
+            String message = String.format("ERROR for matching of '%s' from stacktrace: %s", testFailureMethod, String.join("\n", testStackTraceList));
             log.error(message);
             RunTestNGResultsParserToXls.viewAlert(message);
             e.printStackTrace();
@@ -63,12 +63,13 @@ public class SummaryReport {
             if (i != 0
                     &&
                     (testStackTraceList.get(i - 1).contains(".BaseTestPage.")
+                            || testStackTraceList.get(i - 1).contains("$")
                             || (!testStackTraceList.get(i - 1).trim().startsWith("at ")
                             && !testStackTraceList.get(i - 1).contains("java")))) {
                 return stackTraceLine;
             }
         }
-        log.debug(String.format("!!!   Debug StackTrace parsing:   !!!\n%s", testStackTraceList.toString()));
+        log.debug(String.format("!!!   Debug StackTrace parsing:   !!!\n%s", String.join("\n", testStackTraceList)));
         return testStackTraceList.get(stackTraceSize - 1);
     }
 
