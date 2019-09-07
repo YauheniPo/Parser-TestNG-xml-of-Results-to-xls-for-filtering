@@ -8,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -56,34 +57,15 @@ public class RunTestNGResultsParserToXls {
     }
 
     public static File getGenerateExcelReportFile(String reportTestNGPath) {
-        File generateFile = null;
-        String message = null;
-        try {
-            Browser.getInstance();
-            Browser.openUrl(reportTestNGPath);
-            List<String> failedTestsNames = reportPage.getFailedTestsNames();
-            List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktraces();
-            generateFile = getGenerateReportFile(reportTestNGPath, failedTestsNames.size(), failedTestsStacktrace.size(), EXCEL_EXTENSION);
-            fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
-            Map<String, List<String>> reportSummary = SummaryReport.groupingTestsFailed(failedTestsNames, failedTestsStacktrace);
-            fetchSummaryExcelSheet(reportSummary);
-            excelGenerator.createFile(generateFile);
-            message = String.format("Excel file PATH:\n%s", generateFile.getPath());
-        } catch (Exception e) {
-            message = Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
-            log.error(e);
-            e.printStackTrace();
-        } finally {
-            log.info(message);
-            Browser.getInstance().exit();
-            viewAlert(message);
-        }
-        return generateFile;
+        return getGenerateExcelReportFile(reportTestNGPath, getGenerateReportFile(reportTestNGPath, EXCEL_EXTENSION));
     }
 
     public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName) {
-        File generateFile = new File(
-                getDecodeAbsolutePath(generateReportPath) + File.separator + generateReportName + "." + EXCEL_EXTENSION);
+        return getGenerateExcelReportFile(reportTestNGPath, new File(
+                getDecodeAbsolutePath(generateReportPath) + File.separator + generateReportName + "." + EXCEL_EXTENSION));
+    }
+
+    public static File getGenerateExcelReportFile(String reportTestNGPath, File generateFile) {
         String message = null;
         try {
             Browser.getInstance();
@@ -95,6 +77,8 @@ public class RunTestNGResultsParserToXls {
             fetchSummaryExcelSheet(reportSummary);
             excelGenerator.createFile(generateFile);
             message = String.format("Excel file PATH:\n%s", generateFile.getPath());
+        } catch (FileNotFoundException fileNotFoundException) {
+            message = fileNotFoundException.getMessage();
         } catch (Exception e) {
             message = Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
             log.error(e);
@@ -199,11 +183,9 @@ public class RunTestNGResultsParserToXls {
         excelGenerator.writeFileSheet("summary", countFailed, failedMethods, columnTestsCells);
     }
 
-    private static String getGenerateReportFileName(String reportTestNGPath, int failedTestsNamesCount, int failedTestsStacktraceCount, String extension) {
-        return String.format("%s_%dTests_%dStacktrace.%s",
+    private static String getGenerateReportFileName(String reportTestNGPath, String extension) {
+        return String.format("%s.%s",
                 FilenameUtils.removeExtension(getFileName(reportTestNGPath)),
-                failedTestsNamesCount,
-                failedTestsStacktraceCount,
                 extension);
     }
 
@@ -215,8 +197,8 @@ public class RunTestNGResultsParserToXls {
         return new File(getParentFilePath() + File.separator + generateFileName);
     }
 
-    private static File getGenerateReportFile(String reportTestNGPath, int failedTestsNamesCount, int failedTestsStacktraceCount, String extension) {
-        return new File(getParentFilePath() + File.separator + getGenerateReportFileName(reportTestNGPath, failedTestsNamesCount, failedTestsStacktraceCount, extension));
+    private static File getGenerateReportFile(String reportTestNGPath, String extension) {
+        return new File(getParentFilePath() + File.separator + getGenerateReportFileName(reportTestNGPath, extension));
     }
 
     private static String getParentFilePath() {
