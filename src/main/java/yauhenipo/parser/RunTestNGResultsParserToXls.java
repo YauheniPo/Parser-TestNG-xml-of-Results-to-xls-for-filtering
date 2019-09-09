@@ -1,5 +1,6 @@
 package yauhenipo.parser;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import yauhenipo.parser.driver.Browser;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
@@ -8,6 +9,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -23,8 +25,8 @@ public class RunTestNGResultsParserToXls {
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
     private static final String EXCEL_EXTENSION = "xlsx";
 
-    public static void main(String[] args) {
-        String reportTestNGPath = null;
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        String reportTestNGPath;
         try {
             if (args.length == 0) {
                 isWindowRun = true;
@@ -33,7 +35,7 @@ public class RunTestNGResultsParserToXls {
                 reportTestNGPath = file.getAbsolutePath();
 //                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\emailable-report.html";
             } else {
-                log.debug(String.format("args values: %s", Arrays.asList(args).toString()));
+                log.debug(String.format("Args values:\n%s", Arrays.toString(args)));
                 reportTestNGPath = getDecodeAbsolutePath(args[0]);
             }
 
@@ -42,48 +44,30 @@ public class RunTestNGResultsParserToXls {
             try {
                 saveRemoteBasicReportFile(reportTestNGPath, getGenerateReportFile(getFileName(reportTestNGPath)).getAbsolutePath());
             } catch (Exception e) {
-                String msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, e.getMessage());
+                String msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, ExceptionUtils.getStackTrace(e));
                 log.error(msg);
                 viewAlert("File generation will continue after closing the window.\n" + msg);
             }
         } catch (Exception e) {
-            log.error(e);
-            viewAlert(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n")));
-            e.printStackTrace();
+            String msg = ExceptionUtils.getStackTrace(e);
+            log.error(msg);
+            viewAlert(msg);
+            throw e;
         }
         File generateFile = getGenerateExcelReportFile(reportTestNGPath);
         openDesktopFile(generateFile);
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath) {
-        File generateFile = null;
-        String message = null;
-        try {
-            Browser.getInstance();
-            Browser.openUrl(reportTestNGPath);
-            List<String> failedTestsNames = reportPage.getFailedTestsNames();
-            List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktraces();
-            generateFile = getGenerateReportFile(reportTestNGPath, failedTestsNames.size(), failedTestsStacktrace.size(), EXCEL_EXTENSION);
-            fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
-            Map<String, List<String>> reportSummary = SummaryReport.groupingTestsFailed(failedTestsNames, failedTestsStacktrace);
-            fetchSummaryExcelSheet(reportSummary);
-            excelGenerator.createFile(generateFile);
-            message = String.format("Excel file PATH:\n%s", generateFile.getPath());
-        } catch (Exception e) {
-            message = Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
-            log.error(e);
-            e.printStackTrace();
-        } finally {
-            log.info(message);
-            Browser.getInstance().exit();
-            viewAlert(message);
-        }
-        return generateFile;
+    public static File getGenerateExcelReportFile(String reportTestNGPath) throws UnsupportedEncodingException {
+        return getGenerateExcelReportFile(reportTestNGPath, getGenerateReportFile(reportTestNGPath, EXCEL_EXTENSION));
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName) {
-        File generateFile = new File(
-                getDecodeAbsolutePath(generateReportPath) + File.separator + generateReportName + "." + EXCEL_EXTENSION);
+    public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName) throws UnsupportedEncodingException {
+        return getGenerateExcelReportFile(reportTestNGPath, new File(
+                String.format("%s.%s", getDecodeAbsolutePath(generateReportPath) + File.separator + generateReportName, EXCEL_EXTENSION)));
+    }
+
+    public static File getGenerateExcelReportFile(String reportTestNGPath, File generateFile) {
         String message = null;
         try {
             Browser.getInstance();
@@ -95,12 +79,14 @@ public class RunTestNGResultsParserToXls {
             fetchSummaryExcelSheet(reportSummary);
             excelGenerator.createFile(generateFile);
             message = String.format("Excel file PATH:\n%s", generateFile.getPath());
+            log.info(message);
+        } catch (FileNotFoundException fileNotFoundException) {
+            message = ExceptionUtils.getStackTrace(fileNotFoundException);
         } catch (Exception e) {
-            message = Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
-            log.error(e);
+            message = ExceptionUtils.getStackTrace(e);
+            log.error(message);
             e.printStackTrace();
         } finally {
-            log.info(message);
             Browser.getInstance().exit();
             viewAlert(message);
         }
@@ -112,28 +98,26 @@ public class RunTestNGResultsParserToXls {
             try {
                 Desktop.getDesktop().open(generateFile);
             } catch (IOException e) {
-                log.error(e);
-                viewAlert(String.format("Open desktop file: %s", e.getMessage()));
+                String msg = ExceptionUtils.getStackTrace(e);
+                log.error(msg);
+                viewAlert(String.format("Open desktop file:\n%s", msg));
             }
         }
     }
 
     private static void saveRemoteBasicReportFile(String originalFilePath, String copyFilePath) throws IOException {
-        if (!originalFilePath.contains(":")) {
+        if (!originalFilePath.contains(":") || originalFilePath.startsWith("file:")) {
             FileUtils.copyFile(new File(originalFilePath), new File(copyFilePath));
         }
     }
 
-    private static JFileChooser viewFileChooser() {
+    private static JFileChooser viewFileChooser() throws UnsupportedEncodingException {
         JFileChooser jFileChooser = new JFileChooser() {
 
             @Override
-            protected JDialog createDialog(Component parent)
-                    throws HeadlessException {
+            protected JDialog createDialog(Component parent) throws HeadlessException {
                 JDialog dialog = super.createDialog(parent);
-                // config here as needed - just to see a difference
                 dialog.setLocationByPlatform(true);
-                // might help - can't know because I can't reproduce the problem
                 dialog.setAlwaysOnTop(true);
                 return dialog;
             }
@@ -146,27 +130,24 @@ public class RunTestNGResultsParserToXls {
 
     static void viewAlert(String message) {
         if (isWindowRun) {
-            JOptionPane.showMessageDialog(null, message);
+            JOptionPane pane = new JOptionPane();
+            pane.setMessage(message);
+            JDialog dialog = pane.createDialog("Message");
+            dialog.setAlwaysOnTop(true);
+            dialog.setVisible(true);
         }
     }
 
-    public static String getDecodeAbsolutePath(String sourcePath) {
+    public static String getDecodeAbsolutePath(String sourcePath) throws UnsupportedEncodingException {
         return decode(new File(sourcePath).getAbsolutePath());
     }
 
-    private static String getSourcePath() {
+    private static String getSourcePath() throws UnsupportedEncodingException {
         return getDecodeAbsolutePath(RunTestNGResultsParserToXls.class.getProtectionDomain().getCodeSource().getLocation().getPath());
     }
 
-    public static String decode(String path) {
-        try {
+    public static String decode(String path) throws UnsupportedEncodingException {
             return URLDecoder.decode(path, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            log.error(e);
-            viewAlert(e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private static void fetchReportExcelSheet(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
@@ -174,16 +155,7 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static void fetchSummaryExcelSheet(Map<String, List<String>> mapTests) {
-        Map<String, List<String>> sortedMapTests = mapTests.entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getValue().size(), Comparator.reverseOrder()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> {
-                            throw new AssertionError();
-                        },
-                        LinkedHashMap::new
-                ));
+        Map<String, List<String>> sortedMapTests = getSortingSummaryMapByTestsFailed(mapTests);
         List<String> failedMethods = new ArrayList<>(sortedMapTests.keySet());
         List<String> countFailed = new ArrayList<>();
         List<String> columnTestsCells = new ArrayList<>();
@@ -199,11 +171,22 @@ public class RunTestNGResultsParserToXls {
         excelGenerator.writeFileSheet("summary", countFailed, failedMethods, columnTestsCells);
     }
 
-    private static String getGenerateReportFileName(String reportTestNGPath, int failedTestsNamesCount, int failedTestsStacktraceCount, String extension) {
-        return String.format("%s_%dTests_%dStacktrace.%s",
+    private static Map<String, List<String>> getSortingSummaryMapByTestsFailed(Map<String, List<String>> mapTests) {
+        return mapTests.entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getValue().size(), Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> {
+                            throw new AssertionError();
+                        },
+                        LinkedHashMap::new
+                ));
+    }
+
+    private static String getGenerateReportFileName(String reportTestNGPath, String extension) {
+        return String.format("%s.%s",
                 FilenameUtils.removeExtension(getFileName(reportTestNGPath)),
-                failedTestsNamesCount,
-                failedTestsStacktraceCount,
                 extension);
     }
 
@@ -211,15 +194,15 @@ public class RunTestNGResultsParserToXls {
         return FilenameUtils.getName(file);
     }
 
-    private static File getGenerateReportFile(String generateFileName) {
+    private static File getGenerateReportFile(String generateFileName) throws UnsupportedEncodingException {
         return new File(getParentFilePath() + File.separator + generateFileName);
     }
 
-    private static File getGenerateReportFile(String reportTestNGPath, int failedTestsNamesCount, int failedTestsStacktraceCount, String extension) {
-        return new File(getParentFilePath() + File.separator + getGenerateReportFileName(reportTestNGPath, failedTestsNamesCount, failedTestsStacktraceCount, extension));
+    private static File getGenerateReportFile(String reportTestNGPath, String extension) throws UnsupportedEncodingException {
+        return new File(getParentFilePath() + File.separator + getGenerateReportFileName(reportTestNGPath, extension));
     }
 
-    private static String getParentFilePath() {
+    private static String getParentFilePath() throws UnsupportedEncodingException {
         return new File(getSourcePath()).getParent();
     }
 }

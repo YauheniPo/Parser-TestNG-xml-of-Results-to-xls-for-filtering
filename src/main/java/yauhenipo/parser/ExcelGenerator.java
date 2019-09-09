@@ -1,6 +1,10 @@
 package yauhenipo.parser;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -11,10 +15,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-class ExcelGenerator {
+@NoArgsConstructor
+public class ExcelGenerator {
 
+    @Getter
     private XSSFWorkbook workbook = new XSSFWorkbook();
 
+    public ExcelGenerator(String path) throws IOException, InvalidFormatException {
+        OPCPackage pkg = OPCPackage.open(path);
+        workbook = new XSSFWorkbook(pkg);
+    }
     @SafeVarargs
     final void writeFileSheet(String sheetName, List<String>... columnLists) {
         XSSFSheet sheet = workbook.createSheet(sheetName);
@@ -37,5 +47,9 @@ class ExcelGenerator {
         try (FileOutputStream out = new FileOutputStream(file)) {
             workbook.write(out);
         }
+    }
+
+    public XSSFSheet getSheet(String sheetName) {
+        return workbook.getSheet(sheetName);
     }
 }
