@@ -6,7 +6,7 @@
 
     <groupId>ParseTestNGResultsXml</groupId>
     <artifactId>parse_testng_results</artifactId>
-    <version>2.2.2.YauheniPo</version>
+    <version>2.3.YauheniPo</version>
 
     <properties>
         <dir>${project.basedir}/jar</dir>
@@ -140,6 +140,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
         </dependency>
     </dependencies>
 </project>

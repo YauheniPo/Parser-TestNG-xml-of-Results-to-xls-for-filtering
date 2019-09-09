@@ -60,14 +60,11 @@ public class SummaryReport {
         for (int i = stackTraceSize - 1; 0 <= i; --i) {
             String stackTraceLine = testStackTraceList.get(i);
             if (i != 0
-                    &&
-                    (testStackTraceList.get(i - 1).contains(".BaseTestPage.")
-                            || testStackTraceList.get(i - 1).contains("$")
-                            || testStackTraceList.get(i - 1).contains("<")
-                            ||
-                            (!testStackTraceList.get(i - 1).trim().startsWith("at ")
-                                    &&
-                                    !testStackTraceList.get(i - 1).contains("java")))) {
+                    && (!testStackTraceList.get(i - 1).contains(".pages.")
+                    || testStackTraceList.get(i - 1).contains("$")
+                    || testStackTraceList.get(i - 1).contains("<")
+                    || (!testStackTraceList.get(i - 1).trim().startsWith("at ")
+                    && !testStackTraceList.get(i - 1).contains(".java:")))) {
                 return stackTraceLine;
             }
         }
