@@ -39,7 +39,7 @@ public class ReportParsingTest {
     @Test(dependsOnMethods = "excelReportFileGenerateTest")
     public void excelReportFileDataRowsTest() {
         try {
-            XSSFSheet reportSheet = new ExcelGenerator(reportParsedFile.getAbsolutePath()).getWorkbook().getSheet("report");
+            XSSFSheet reportSheet = new ExcelGenerator(reportParsedFile.getAbsolutePath()).getSheet("report");
             int actualFailedTestRows = reportSheet.getLastRowNum();
             Assert.assertEquals(actualFailedTestRows, 0, "Invalid generated test report failed test name.");
         } catch (IOException | InvalidFormatException e) {
@@ -51,7 +51,7 @@ public class ReportParsingTest {
     public void excelReportFileDataColumnsTest() {
         try {
             DataFormatter dataFormatter = new DataFormatter();
-            XSSFSheet reportSheet = new ExcelGenerator(reportParsedFile.getAbsolutePath()).getWorkbook().getSheet("report");
+            XSSFSheet reportSheet = new ExcelGenerator(reportParsedFile.getAbsolutePath()).getSheet("report");
             String actualFailedTestName = dataFormatter.formatCellValue(reportSheet.getRow(0).getCell(0));
             Assert.assertEquals(actualFailedTestName, failedTestName, "Invalid generated test report failed test name.");
         } catch (IOException | InvalidFormatException e) {

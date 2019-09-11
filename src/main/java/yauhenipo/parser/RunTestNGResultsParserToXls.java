@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class RunTestNGResultsParserToXls {
     private static final ReportPage reportPage = new ReportPage();
     private static boolean isWindowRun = false;
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
-    private static final String EXCEL_EXTENSION = "xlsx";
+    private static final String EXCEL_EXTENSION = ".xlsx";
 
     public static void main(String[] args) throws UnsupportedEncodingException {
         String reportTestNGPath;
@@ -160,13 +161,9 @@ public class RunTestNGResultsParserToXls {
         List<String> countFailed = new ArrayList<>();
         List<String> columnTestsCells = new ArrayList<>();
         for (String failedMethod : failedMethods) {
-            String columnTestsCell = "";
             countFailed.add(String.valueOf(sortedMapTests.get(failedMethod).size()));
             List<String> testsList = sortedMapTests.get(failedMethod);
-            for (String test : testsList) {
-                columnTestsCell = columnTestsCell.concat(test).concat("\r\n");
-            }
-            columnTestsCells.add(columnTestsCell);
+            columnTestsCells.add(String.join("\r\n", testsList));
         }
         excelGenerator.writeFileSheet("summary", countFailed, failedMethods, columnTestsCells);
     }
@@ -185,9 +182,7 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static String getGenerateReportFileName(String reportTestNGPath, String extension) {
-        return String.format("%s.%s",
-                FilenameUtils.removeExtension(getFileName(reportTestNGPath)),
-                extension);
+        return FilenameUtils.removeExtension(getFileName(reportTestNGPath)) + extension;
     }
 
     private static String getFileName(String file) {
@@ -195,11 +190,11 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static File getGenerateReportFile(String generateFileName) throws UnsupportedEncodingException {
-        return new File(getParentFilePath() + File.separator + generateFileName);
+        return new File(Paths.get(getParentFilePath(), generateFileName).toString());
     }
 
     private static File getGenerateReportFile(String reportTestNGPath, String extension) throws UnsupportedEncodingException {
-        return new File(getParentFilePath() + File.separator + getGenerateReportFileName(reportTestNGPath, extension));
+        return new File(Paths.get(getParentFilePath(), getGenerateReportFileName(reportTestNGPath, extension)).toString());
     }
 
     private static String getParentFilePath() throws UnsupportedEncodingException {

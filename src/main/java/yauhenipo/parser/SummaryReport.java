@@ -31,7 +31,7 @@ public class SummaryReport {
     }
 
     private static String getFailStacktraceLine(String failedTest, String stackTrace) {
-        List<String> stackTraceStringsList = Arrays.asList(stackTrace.split("\\n"));
+        List<String> stackTraceStringsList = Arrays.asList(stackTrace.split("\n"));
         int testStringNum = getNumberString(failedTest, stackTraceStringsList);
         List<String> testStackTraceList = IntStream.range(0, testStringNum).mapToObj(stackTraceStringsList::get).collect(Collectors.toList());
         return findFailStacktraceLine(testStackTraceList);
@@ -42,7 +42,7 @@ public class SummaryReport {
         if (testStackTraceList.size() == 1) {
             return testFailureMethod;
         }
-        Pattern r = Pattern.compile("\\.(\\w*\\$?\\w*\\.((<?\\w*>?)|(\\w*\\$?\\w*\\$?\\d*?)))\\(");
+        Pattern r = Pattern.compile("\\.(\\w*\\.\\w*)\\(");
         Matcher m = r.matcher(testFailureMethod);
         m.find();
         try {
@@ -59,16 +59,10 @@ public class SummaryReport {
         int stackTraceSize = testStackTraceList.size();
         for (int i = stackTraceSize - 1; 0 <= i; --i) {
             String stackTraceLine = testStackTraceList.get(i);
-            if (i != 0
-                    && (!testStackTraceList.get(i - 1).contains(".pages.")
-                    || testStackTraceList.get(i - 1).contains("$")
-                    || testStackTraceList.get(i - 1).contains("<")
-                    || (!testStackTraceList.get(i - 1).trim().startsWith("at ")
-                    && !testStackTraceList.get(i - 1).contains(".java:")))) {
+            if (i != 0 && !testStackTraceList.get(i - 1).contains("com.mscs.emr.test.functional.g2.pages.")) {
                 return stackTraceLine;
             }
         }
-        log.debug(String.format("!!!   Debug StackTrace parsing:   !!!\n%s", String.join("\n", testStackTraceList)));
         return testStackTraceList.get(stackTraceSize - 1);
     }
 

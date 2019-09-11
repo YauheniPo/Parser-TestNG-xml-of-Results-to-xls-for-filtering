@@ -1,6 +1,5 @@
 package yauhenipo.parser;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -18,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 public class ExcelGenerator {
 
-    @Getter
     private XSSFWorkbook workbook = new XSSFWorkbook();
 
     public ExcelGenerator(String path) throws IOException, InvalidFormatException {

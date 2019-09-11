@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 class ReportPage {
 
-    private static final By FAILED_TESTS_NAMES_LOCATOR = By.xpath("//div[@class='stacktrace']/preceding::*[starts-with(@id, 'm')]");
+    private static final By FAILED_TESTS_NAMES_LOCATOR = By.xpath("//div[@class='stacktrace']/ancestor::*/preceding-sibling::*[starts-with(@id, 'm') or contains(text(), '.test.')]");
     private static final By FAILED_TESTS_STACKTRACE_LOCATOR = By.xpath("//*[@id]//following-sibling::*//div[@class='stacktrace']");
     private static final String FAILED_TESTS_NAMES_JENKINS_PLUGIN_REPORT_XPATH = "//table[@class='invocation-failed']//tr//td[@title]";
     private static final By FAILED_TESTS_NAMES_JENKINS_PLUGIN_REPORT_LOCATOR = By.xpath(FAILED_TESTS_NAMES_JENKINS_PLUGIN_REPORT_XPATH);
