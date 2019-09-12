@@ -26,7 +26,7 @@ public class RunTestNGResultsParserToXls {
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
     private static final String EXCEL_EXTENSION = ".xlsx";
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
+    public static void main(String[] args) throws IOException {
         String reportTestNGPath;
         try {
             if (args.length == 0) {
@@ -48,6 +48,7 @@ public class RunTestNGResultsParserToXls {
                 String msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, ExceptionUtils.getStackTrace(e));
                 log.error(msg);
                 viewAlert("File generation will continue after closing the window.\n" + msg);
+                throw e;
             }
         } catch (Exception e) {
             String msg = ExceptionUtils.getStackTrace(e);
@@ -59,22 +60,22 @@ public class RunTestNGResultsParserToXls {
         openDesktopFile(generateFile);
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath) throws UnsupportedEncodingException {
+    public static File getGenerateExcelReportFile(String reportTestNGPath) throws IOException {
         return getGenerateExcelReportFile(reportTestNGPath, getGenerateReportFile(reportTestNGPath, EXCEL_EXTENSION));
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName) throws UnsupportedEncodingException {
+    public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName) throws IOException {
         return getGenerateExcelReportFile(reportTestNGPath, new File(
-                String.format("%s.%s", getDecodeAbsolutePath(generateReportPath) + File.separator + generateReportName, EXCEL_EXTENSION)));
+                Paths.get(getDecodeAbsolutePath(generateReportPath), generateReportName + EXCEL_EXTENSION).toString()));
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath, File generateFile) {
+    public static File getGenerateExcelReportFile(String reportTestNGPath, File generateFile) throws IOException {
         String message = null;
         try {
             Browser.getInstance();
             Browser.openUrl(reportTestNGPath);
             List<String> failedTestsNames = reportPage.getFailedTestsNames();
-            List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktraces();
+            List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktrace();
             fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
             Map<String, List<String>> reportSummary = SummaryReport.groupingTestsFailed(failedTestsNames, failedTestsStacktrace);
             fetchSummaryExcelSheet(reportSummary);
@@ -86,12 +87,42 @@ public class RunTestNGResultsParserToXls {
         } catch (Exception e) {
             message = ExceptionUtils.getStackTrace(e);
             log.error(message);
-            e.printStackTrace();
+            throw e;
         } finally {
             Browser.getInstance().exit();
             viewAlert(message);
         }
         return generateFile;
+    }
+
+    private static void fetchReportExcelSheet(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
+        excelGenerator.writeDataToExcelSheet("report", failedTestsNames, failedTestsStacktrace);
+    }
+
+    private static void fetchSummaryExcelSheet(Map<String, List<String>> mapTests) {
+        Map<String, List<String>> sortedMapTests = getSortingSummaryMapByTestsFailed(mapTests);
+        List<String> failedMethods = new ArrayList<>(sortedMapTests.keySet());
+        List<String> countFailed = new ArrayList<>();
+        List<String> columnTestsCells = new ArrayList<>();
+        for (String failedMethod : failedMethods) {
+            countFailed.add(String.valueOf(sortedMapTests.get(failedMethod).size()));
+            List<String> testsList = sortedMapTests.get(failedMethod);
+            columnTestsCells.add(String.join("\r\n", testsList));
+        }
+        excelGenerator.writeDataToExcelSheet("summary", countFailed, failedMethods, columnTestsCells);
+    }
+
+    private static Map<String, List<String>> getSortingSummaryMapByTestsFailed(Map<String, List<String>> mapTests) {
+        return mapTests.entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getValue().size(), Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> {
+                            throw new AssertionError();
+                        },
+                        LinkedHashMap::new
+                ));
     }
 
     private static void openDesktopFile(File generateFile) {
@@ -149,36 +180,6 @@ public class RunTestNGResultsParserToXls {
 
     public static String decode(String path) throws UnsupportedEncodingException {
             return URLDecoder.decode(path, "UTF-8");
-    }
-
-    private static void fetchReportExcelSheet(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
-        excelGenerator.writeFileSheet("report", failedTestsNames, failedTestsStacktrace);
-    }
-
-    private static void fetchSummaryExcelSheet(Map<String, List<String>> mapTests) {
-        Map<String, List<String>> sortedMapTests = getSortingSummaryMapByTestsFailed(mapTests);
-        List<String> failedMethods = new ArrayList<>(sortedMapTests.keySet());
-        List<String> countFailed = new ArrayList<>();
-        List<String> columnTestsCells = new ArrayList<>();
-        for (String failedMethod : failedMethods) {
-            countFailed.add(String.valueOf(sortedMapTests.get(failedMethod).size()));
-            List<String> testsList = sortedMapTests.get(failedMethod);
-            columnTestsCells.add(String.join("\r\n", testsList));
-        }
-        excelGenerator.writeFileSheet("summary", countFailed, failedMethods, columnTestsCells);
-    }
-
-    private static Map<String, List<String>> getSortingSummaryMapByTestsFailed(Map<String, List<String>> mapTests) {
-        return mapTests.entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getValue().size(), Comparator.reverseOrder()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> {
-                            throw new AssertionError();
-                        },
-                        LinkedHashMap::new
-                ));
     }
 
     private static String getGenerateReportFileName(String reportTestNGPath, String extension) {

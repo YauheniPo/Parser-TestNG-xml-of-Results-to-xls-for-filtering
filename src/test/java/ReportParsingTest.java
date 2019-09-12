@@ -9,7 +9,6 @@ import yauhenipo.parser.RunTestNGResultsParserToXls;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
 public class ReportParsingTest {
@@ -26,7 +25,7 @@ public class ReportParsingTest {
             testReport = RunTestNGResultsParserToXls.getDecodeAbsolutePath(
                     Objects.requireNonNull(ReportParsingTest.class.getClassLoader().getResource(TEST_REPORT_FILE_NAME)).getPath());
             reportParsedFile = RunTestNGResultsParserToXls.getGenerateExcelReportFile(testReport);
-        } catch (UnsupportedEncodingException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

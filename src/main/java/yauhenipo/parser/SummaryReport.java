@@ -16,7 +16,7 @@ public class SummaryReport {
 
         for (int rowNum = 0; rowNum < failedTestsNames.size(); ++rowNum) {
             String failedTest = failedTestsNames.get(rowNum).replace("()", "");
-            String failedMethod = getFailStacktraceLine(failedTest, failedTestsStacktrace.get(rowNum));
+            String failedMethod = fetchFailStacktraceMethod(failedTest, failedTestsStacktrace.get(rowNum));
 
             List<String> actualList;
             if (testsMap.get(failedMethod) == null) {
@@ -30,15 +30,15 @@ public class SummaryReport {
         return testsMap;
     }
 
-    private static String getFailStacktraceLine(String failedTest, String stackTrace) {
+    private static String fetchFailStacktraceMethod(String failedTest, String stackTrace) {
         List<String> stackTraceStringsList = Arrays.asList(stackTrace.split("\n"));
-        int testStringNum = getNumberString(failedTest, stackTraceStringsList);
+        int testStringNum = getIndexTestNameFromStacktrace(failedTest, stackTraceStringsList);
         List<String> testStackTraceList = IntStream.range(0, testStringNum).mapToObj(stackTraceStringsList::get).collect(Collectors.toList());
-        return findFailStacktraceLine(testStackTraceList);
+        return getFormattingFailStacktraceMethod(testStackTraceList);
     }
 
-    private static String findFailStacktraceLine(List<String> testStackTraceList) {
-        String testFailureMethod = getTestFailureMethod(new ArrayList<>(testStackTraceList));
+    private static String getFormattingFailStacktraceMethod(List<String> testStackTraceList) {
+        String testFailureMethod = findTestFailureStacktraceLine(new ArrayList<>(testStackTraceList));
         if (testStackTraceList.size() == 1) {
             return testFailureMethod;
         }
@@ -55,7 +55,7 @@ public class SummaryReport {
         return null;
     }
 
-    private static String getTestFailureMethod(List<String> testStackTraceList) {
+    private static String findTestFailureStacktraceLine(List<String> testStackTraceList) {
         int stackTraceSize = testStackTraceList.size();
         for (int i = stackTraceSize - 1; 0 <= i; --i) {
             String stackTraceLine = testStackTraceList.get(i);
@@ -66,7 +66,7 @@ public class SummaryReport {
         return testStackTraceList.get(stackTraceSize - 1);
     }
 
-    private static int getNumberString(String expectString, List<String> list) {
+    private static int getIndexTestNameFromStacktrace(String expectString, List<String> list) {
         for (int rowNum = 0; rowNum < list.size(); ++rowNum) {
             if (list.get(rowNum).contains(expectString) || list.get(rowNum).contains("BaseTestPage.run")) {
                 return rowNum;

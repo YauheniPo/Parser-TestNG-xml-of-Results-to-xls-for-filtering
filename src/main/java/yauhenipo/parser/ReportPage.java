@@ -26,15 +26,15 @@ class ReportPage {
         return failedTestsNames.stream().map(test -> test.replace(":", ".").replace("#", ".")).collect(Collectors.toList());
     }
 
-    List<String> getFailedTestsStacktraces() {
-        List<String> failedTestsStacktraces = getTextElements(Browser.getDriver(), FAILED_TESTS_STACKTRACE_LOCATOR);
-        if (failedTestsStacktraces.isEmpty()) {
-            failedTestsStacktraces = Browser.getDriver().findElements(FAILED_TESTS_STACKTRACE_JENKINS_PLUGIN_REPORT_LOCATOR).stream()
+    List<String> getFailedTestsStacktrace() {
+        List<String> failedTestsStacktrace = getTextElements(Browser.getDriver(), FAILED_TESTS_STACKTRACE_LOCATOR);
+        if (failedTestsStacktrace.isEmpty()) {
+            failedTestsStacktrace = Browser.getDriver().findElements(FAILED_TESTS_STACKTRACE_JENKINS_PLUGIN_REPORT_LOCATOR).stream()
                     .map(stacktrace -> stacktrace.getText()
                             .replace("Click to show all stack frames", ""))
                     .collect(Collectors.toList());
         }
-        return failedTestsStacktraces;
+        return failedTestsStacktrace;
     }
 
     private static List<String> getTextElements(WebDriver driver, By locator) {

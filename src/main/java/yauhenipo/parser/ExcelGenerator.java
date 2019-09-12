@@ -24,7 +24,7 @@ public class ExcelGenerator {
         workbook = new XSSFWorkbook(pkg);
     }
     @SafeVarargs
-    final void writeFileSheet(String sheetName, List<String>... columnLists) {
+    final void writeDataToExcelSheet(String sheetName, List<String>... columnLists) {
         XSSFSheet sheet = workbook.createSheet(sheetName);
         for (int rowNum = 0; rowNum < columnLists[0].size(); ++rowNum) {
             Row row = sheet.createRow(rowNum);
