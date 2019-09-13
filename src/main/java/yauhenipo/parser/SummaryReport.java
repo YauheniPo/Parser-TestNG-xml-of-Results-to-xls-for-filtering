@@ -57,18 +57,20 @@ public class SummaryReport {
 
     private static String findTestFailureStacktraceLine(List<String> testStackTraceList) {
         int stackTraceSize = testStackTraceList.size();
-        for (int i = stackTraceSize - 1; 0 <= i; --i) {
-            String stackTraceLine = testStackTraceList.get(i);
-            if (i != 0 && !testStackTraceList.get(i - 1).contains("com.mscs.emr.test.functional.g2.pages.")) {
+        for (int rowNum = stackTraceSize - 1; 0 <= rowNum; --rowNum) {
+            String stackTraceLine = testStackTraceList.get(rowNum);
+            if (rowNum != 0 && !testStackTraceList.get(rowNum - 1).contains("com.mscs.emr.test.functional.g2.pages.")) {
                 return stackTraceLine;
             }
         }
         return testStackTraceList.get(stackTraceSize - 1);
     }
 
-    private static int getIndexTestNameFromStacktrace(String expectString, List<String> list) {
-        for (int rowNum = 0; rowNum < list.size(); ++rowNum) {
-            if (list.get(rowNum).contains(expectString) || list.get(rowNum).contains("BaseTestPage.run")) {
+    private static int getIndexTestNameFromStacktrace(String expectString, List<String> testStackTraceList) {
+        int stackTraceSize = testStackTraceList.size();
+        for (int rowNum = stackTraceSize - 1; 0 <= rowNum; --rowNum) {
+            String stackTraceLine = testStackTraceList.get(rowNum);
+            if (stackTraceLine.contains(expectString) || stackTraceLine.contains(".BaseTestPage.")) {
                 return rowNum;
             }
         }
