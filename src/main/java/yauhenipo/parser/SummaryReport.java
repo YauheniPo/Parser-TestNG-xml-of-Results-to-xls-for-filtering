@@ -68,12 +68,18 @@ public class SummaryReport {
 
     private static int getIndexTestNameFromStacktrace(String expectString, List<String> testStackTraceList) {
         int stackTraceSize = testStackTraceList.size();
-        for (int rowNum = stackTraceSize - 1; 0 <= rowNum; --rowNum) {
-            String stackTraceLine = testStackTraceList.get(rowNum);
-            if (stackTraceLine.contains(expectString) || stackTraceLine.contains(".BaseTestPage.")) {
+        for (int rowNum = 0; rowNum < stackTraceSize; ++rowNum) {
+            if (testStackTraceList.get(rowNum).contains(expectString)) {
                 return rowNum;
             }
         }
+        for (int rowNum = stackTraceSize - 1; 0 <= rowNum; --rowNum) {
+            String stackTraceLine = testStackTraceList.get(rowNum);
+            if (stackTraceLine.contains("com.mscs.emr.test.functional.BaseTestPage.")) {
+                return rowNum;
+            }
+        }
+
         RuntimeException runtimeException = new RuntimeException(String.format("List does not contain '%s'.", expectString));
         log.error(runtimeException);
         throw runtimeException;
