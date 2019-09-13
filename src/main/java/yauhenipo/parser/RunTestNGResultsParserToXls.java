@@ -1,12 +1,14 @@
 package yauhenipo.parser;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import yauhenipo.parser.driver.Browser;
+import org.xml.sax.SAXException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,61 +23,69 @@ import java.util.stream.Collectors;
 @Log4j2
 public class RunTestNGResultsParserToXls {
 
-    private static final ReportPage reportPage = new ReportPage();
+    private static ReportPageParser reportPageParser;
     private static boolean isWindowRun = false;
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
     private static final String EXCEL_EXTENSION = ".xlsx";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        String msg = null;
         String reportTestNGPath;
         try {
             if (args.length == 0) {
                 isWindowRun = true;
                 JFileChooser jFileChooser = viewFileChooser();
                 File file = jFileChooser.getSelectedFile();
+                if (file == null) {
+                    msg = ">>>>>>   Report file does not identify   <<<<<<";
+                    throw new NullPointerException(msg);
+                }
                 reportTestNGPath = file.getAbsolutePath();
 //                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\emailable-report.html";
             } else {
                 log.debug(String.format("Args values:\n%s", Arrays.toString(args)));
                 reportTestNGPath = getDecodeAbsolutePath(args[0]);
             }
-
             log.info(String.format(">>>>>>   Report file path:   <<<<<<\n%s", reportTestNGPath));
 
             try {
                 saveRemoteBasicReportFile(reportTestNGPath, getGenerateReportFile(getFileName(reportTestNGPath)).getAbsolutePath());
             } catch (Exception e) {
-                String msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, ExceptionUtils.getStackTrace(e));
-                log.error(msg);
-                viewAlert("File generation will continue after closing the window.\n" + msg);
+                msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, ExceptionUtils.getStackTrace(e));
                 throw e;
             }
+            reportPageParser = new ReportPageParser(reportTestNGPath);
+            File generateFile = getGenerateExcelReportFile(reportTestNGPath);
+            openDesktopFile(generateFile);
         } catch (Exception e) {
-            String msg = ExceptionUtils.getStackTrace(e);
+            if (msg == null) {
+                msg = ExceptionUtils.getStackTrace(e);
+            }
             log.error(msg);
             viewAlert(msg);
-            throw e;
+        } finally {
+            System.exit(0);
         }
-        File generateFile = getGenerateExcelReportFile(reportTestNGPath);
-        openDesktopFile(generateFile);
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath) throws IOException {
+    public static File getGenerateExcelReportFile(String reportTestNGPath) throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
         return getGenerateExcelReportFile(reportTestNGPath, getGenerateReportFile(reportTestNGPath, EXCEL_EXTENSION));
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName) throws IOException {
+    public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName)
+            throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
         return getGenerateExcelReportFile(reportTestNGPath, new File(
                 Paths.get(getDecodeAbsolutePath(generateReportPath), generateReportName + EXCEL_EXTENSION).toString()));
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath, File generateFile) throws IOException {
-        String message = null;
+    public static File getGenerateExcelReportFile(String reportTestNGPath, File generateFile)
+            throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
+        reportPageParser = new ReportPageParser(reportTestNGPath);
+        String message;
         try {
-            Browser.getInstance();
-            Browser.openUrl(reportTestNGPath);
-            List<String> failedTestsNames = reportPage.getFailedTestsNames();
-            List<String> failedTestsStacktrace = reportPage.getFailedTestsStacktrace();
+            List<String> failedTestsNames = reportPageParser.getFailedTestsNames().stream().map(
+                    test -> test.replace(":", ".").replace("#", ".")).collect(Collectors.toList());
+            List<String> failedTestsStacktrace = reportPageParser.getFailedTestsStacktrace();
             fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
             Map<String, List<String>> reportSummary = SummaryReport.groupingTestsFailed(failedTestsNames, failedTestsStacktrace);
             fetchSummaryExcelSheet(reportSummary);
@@ -84,13 +94,8 @@ public class RunTestNGResultsParserToXls {
             log.info(message);
         } catch (FileNotFoundException fileNotFoundException) {
             message = ExceptionUtils.getStackTrace(fileNotFoundException);
-        } catch (Exception e) {
-            message = ExceptionUtils.getStackTrace(e);
             log.error(message);
-            throw e;
-        } finally {
-            Browser.getInstance().exit();
-            viewAlert(message);
+            throw fileNotFoundException;
         }
         return generateFile;
     }

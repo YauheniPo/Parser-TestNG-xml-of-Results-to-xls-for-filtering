@@ -30,10 +30,11 @@ public class SummaryReport {
         return testsMap;
     }
 
-    private static String fetchFailStacktraceMethod(String failedTest, String stackTrace) {
-        List<String> stackTraceStringsList = Arrays.asList(stackTrace.split("\n"));
+    private static String fetchFailStacktraceMethod(String failedTest, String stackTraceString) {
+        List<String> stackTraceStringsList = Arrays.asList(stackTraceString.split("\n"));
         int testStringNum = getIndexTestNameFromStacktrace(failedTest, stackTraceStringsList);
-        List<String> testStackTraceList = IntStream.range(0, testStringNum).mapToObj(stackTraceStringsList::get).collect(Collectors.toList());
+        List<String> testStackTraceList = IntStream.range(0, testStringNum).mapToObj(stackTraceStringsList::get)
+                .filter(stackTrace -> !stackTrace.trim().equals("at")).collect(Collectors.toList());
         return getFormattingFailStacktraceMethod(testStackTraceList);
     }
 
