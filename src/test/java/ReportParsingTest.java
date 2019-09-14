@@ -4,9 +4,12 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.xml.sax.SAXException;
 import yauhenipo.parser.ExcelGenerator;
 import yauhenipo.parser.RunTestNGResultsParserToXls;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -25,7 +28,7 @@ public class ReportParsingTest {
             testReport = RunTestNGResultsParserToXls.getDecodeAbsolutePath(
                     Objects.requireNonNull(ReportParsingTest.class.getClassLoader().getResource(TEST_REPORT_FILE_NAME)).getPath());
             reportParsedFile = RunTestNGResultsParserToXls.getGenerateExcelReportFile(testReport);
-        } catch (IOException e) {
+        } catch (IOException | XPathExpressionException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
     }
