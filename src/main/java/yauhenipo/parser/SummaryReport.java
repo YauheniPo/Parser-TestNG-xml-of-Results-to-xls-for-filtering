@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Log4j2
-public class SummaryReport {
+class SummaryReport {
 
     static Map<String, List<String>> groupingTestsFailed(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
         Map<String, List<String>> testsMap = new HashMap<>();
@@ -18,12 +18,7 @@ public class SummaryReport {
             String failedTest = failedTestsNames.get(rowNum).replace("()", "");
             String failedMethod = fetchFailStacktraceMethod(failedTest, failedTestsStacktrace.get(rowNum));
 
-            List<String> actualList;
-            if (testsMap.get(failedMethod) == null) {
-                actualList = new ArrayList<>();
-            } else {
-                actualList = testsMap.get(failedMethod);
-            }
+            List<String> actualList = testsMap.get(failedMethod) != null ? testsMap.get(failedMethod) : new ArrayList<>();
             actualList.add(failedTest);
             testsMap.put(failedMethod, actualList);
         }
