@@ -6,7 +6,7 @@
 
     <groupId>ParseTestNGResultsXml</groupId>
     <artifactId>parse_testng_results</artifactId>
-    <version>3.0.YauheniPo</version>
+    <version>3.0.1.YauheniPo</version>
 
     <properties>
         <dir>${project.basedir}/jar</dir>

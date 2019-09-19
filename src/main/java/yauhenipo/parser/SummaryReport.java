@@ -38,7 +38,7 @@ class SummaryReport {
         if (testStackTraceList.size() == 1) {
             return testFailureMethod;
         }
-        Pattern r = Pattern.compile("\\.(\\w*\\.\\w*)\\(");
+        Pattern r = Pattern.compile("\\.(\\w*\\$?\\w*\\.((<?\\w*>?)|(\\w*\\$?\\w*\\$?\\d*?)))\\(");
         Matcher m = r.matcher(testFailureMethod);
         m.find();
         try {

@@ -143,7 +143,7 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static void saveRemoteBasicReportFile(String originalFilePath) throws IOException {
-        if (!originalFilePath.contains(":") || originalFilePath.startsWith("file:")) {
+        if (originalFilePath.matches("((\\w*\\.\\w*)\\\\.)|((\\w*\\.\\w*)/.)")) {
             FileUtils.copyFile(new File(originalFilePath),
                     new File(Paths.get(getParentSourceFilePath(), getFileName(originalFilePath)).toString()));
         }
