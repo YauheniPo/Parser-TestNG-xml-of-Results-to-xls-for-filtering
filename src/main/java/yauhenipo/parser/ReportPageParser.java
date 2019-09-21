@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * Class for parsing HTML file by XPATH
  */
 @Log4j2
-public class ReportPageParser {
+class ReportPageParser {
 
     private XPath xPath;
     private Document xmlDocument;
@@ -38,12 +38,12 @@ public class ReportPageParser {
     private static final String FAILED_TESTS_NAMES_JENKINS_PLUGIN_REPORT_XPATH = "//table[@class='invocation-failed']//tr//td[@title]";
     private static final String FAILED_TESTS_STACKTRACE_JENKINS_PLUGIN_REPORT_XPATH = FAILED_TESTS_NAMES_JENKINS_PLUGIN_REPORT_XPATH + "/following-sibling::td[.//pre]";
 
-    public ReportPageParser(String reportPath) throws ParserConfigurationException, SAXException, IOException {
+    ReportPageParser(String reportPath) throws ParserConfigurationException, SAXException, IOException {
         try {
             String data = new String(Files.readAllBytes(Paths.get(reportPath)));
-            data = data.replace("<meta charset='utf-8'>", "");
-            data = data.replace("<br>", "");
-            data = data.replace("<p>", "");
+            data = data.replace("<meta", "<meta/>");
+            data = data.replace("<br>", "<br/>");
+            data = data.replace("<p>", "<p/>");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setValidating(false);
             dbf.setNamespaceAware(true);

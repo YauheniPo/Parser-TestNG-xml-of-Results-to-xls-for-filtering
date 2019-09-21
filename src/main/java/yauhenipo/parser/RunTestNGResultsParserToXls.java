@@ -41,6 +41,12 @@ public class RunTestNGResultsParserToXls {
                     throw new NullPointerException(msg);
                 }
                 reportTestNGPath = file.getAbsolutePath();
+                try {
+                    saveRemoteBasicReportFile(reportTestNGPath);
+                } catch (Exception e) {
+                    msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, ExceptionUtils.getStackTrace(e));
+                    throw e;
+                }
 //                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\RegressionSuiteFull.html";
             } else {
                 log.debug(String.format("Args values:\n%s", Arrays.toString(args)));
@@ -48,13 +54,6 @@ public class RunTestNGResultsParserToXls {
             }
             log.info(String.format(">>>>>>   Report file PATH:   <<<<<<\n%s", reportTestNGPath));
 
-            try {
-                saveRemoteBasicReportFile(reportTestNGPath);
-            } catch (Exception e) {
-                msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, ExceptionUtils.getStackTrace(e));
-                throw e;
-            }
-            reportPageParser = new ReportPageParser(reportTestNGPath);
             File generateFile = getGenerateExcelReportFile(reportTestNGPath);
             openDesktopFile(generateFile);
         } catch (Exception e) {
@@ -80,14 +79,10 @@ public class RunTestNGResultsParserToXls {
 
     private static File getGenerateExcelReportFile(String reportTestNGPath, File generateFile)
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-        reportPageParser = new ReportPageParser(reportTestNGPath);
         String message;
         try {
-            List<String> failedTestsNames = reportPageParser.getFailedTestsNames().stream().map(
-                    test -> test.replace(":", ".").replace("#", ".")).collect(Collectors.toList());
-            List<String> failedTestsStacktrace = reportPageParser.getFailedTestsStacktrace();
-            fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
-            Map<String, List<String>> reportSummary = SummaryReport.groupingTestsFailed(failedTestsNames, failedTestsStacktrace);
+            Map<String, List<String>> reportSummary = new HashMap<>();
+            reportSummary = getReportSummaryMap(reportTestNGPath, reportSummary);
             fetchSummaryExcelSheet(reportSummary);
             excelGenerator.createFile(generateFile);
             message = String.format(">>>>>>   Excel file PATH:   <<<<<<\n%s", generateFile.getPath());
@@ -98,6 +93,15 @@ public class RunTestNGResultsParserToXls {
             throw fileNotFoundException;
         }
         return generateFile;
+    }
+
+    private static Map<String, List<String>> getReportSummaryMap(String reportTestNGPath, Map<String, List<String>> reportSummary) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
+        reportPageParser = new ReportPageParser(reportTestNGPath);
+        List<String> failedTestsNames = reportPageParser.getFailedTestsNames().stream().map(
+                test -> test.replace(":", ".").replace("#", ".")).collect(Collectors.toList());
+        List<String> failedTestsStacktrace = reportPageParser.getFailedTestsStacktrace();
+        fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
+        return SummaryReport.groupingTestReportSummary(failedTestsNames, failedTestsStacktrace, reportSummary);
     }
 
     private static void fetchReportExcelSheet(List<String> failedTestsNames, List<String> failedTestsStacktrace) {

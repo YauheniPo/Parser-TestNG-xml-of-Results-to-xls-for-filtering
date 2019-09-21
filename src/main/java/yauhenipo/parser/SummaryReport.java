@@ -11,18 +11,16 @@ import java.util.stream.IntStream;
 @Log4j2
 class SummaryReport {
 
-    static Map<String, List<String>> groupingTestsFailed(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
-        Map<String, List<String>> testsMap = new HashMap<>();
-
+    static Map<String, List<String>> groupingTestReportSummary(List<String> failedTestsNames, List<String> failedTestsStacktrace, Map<String, List<String>> reportSummary) {
         for (int rowNum = 0; rowNum < failedTestsNames.size(); ++rowNum) {
             String failedTest = failedTestsNames.get(rowNum).replace("()", "");
             String failedMethod = fetchFailStacktraceMethod(failedTest, failedTestsStacktrace.get(rowNum));
 
-            List<String> actualList = testsMap.get(failedMethod) != null ? testsMap.get(failedMethod) : new ArrayList<>();
+            List<String> actualList = reportSummary.get(failedMethod) != null ? reportSummary.get(failedMethod) : new ArrayList<>();
             actualList.add(failedTest);
-            testsMap.put(failedMethod, actualList);
+            reportSummary.put(failedMethod, actualList);
         }
-        return testsMap;
+        return reportSummary;
     }
 
     private static String fetchFailStacktraceMethod(String failedTest, String stackTraceString) {
