@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @Log4j2
 public class RunTestNGResultsParserToXls {
 
-    private static ReportPageParser reportPageParser;
     private static boolean isWindowRun = false;
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
     private static final String EXCEL_EXTENSION = ".xlsx";
@@ -47,14 +46,12 @@ public class RunTestNGResultsParserToXls {
                     msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, ExceptionUtils.getStackTrace(e));
                     throw e;
                 }
-//                reportTestNGPath = "C:\\Users\\Xiaomi\\Google Диск\\popo\\java\\Parser-TestNG-xml-of-Results-to-xls-for-filtering\\RegressionSuiteFull.html";
-            } else {
-                log.debug(String.format("Args values:\n%s", Arrays.toString(args)));
-                reportTestNGPath = getDecodeAbsolutePath(args[0]);
+                args = new String[]{reportTestNGPath};
             }
-            log.info(String.format(">>>>>>   Report file PATH:   <<<<<<\n%s", reportTestNGPath));
 
-            File generateFile = getGenerateExcelReportFile(reportTestNGPath);
+            log.info(String.format(">>>>>>   Report file PATH:   <<<<<<\n%s", Arrays.toString(args)));
+
+            File generateFile = getGenerateExcelReportFile(args);
             openDesktopFile(generateFile);
         } catch (Exception e) {
             if (msg == null) {
@@ -67,23 +64,36 @@ public class RunTestNGResultsParserToXls {
         }
     }
 
-    public static File getGenerateExcelReportFile(String reportTestNGPath) throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-        return getGenerateExcelReportFile(reportTestNGPath, getGenerateReportFilePath(reportTestNGPath, EXCEL_EXTENSION));
-    }
-
-    public static File getGenerateExcelReportFile(String reportTestNGPath, String generateReportPath, String generateReportName)
+    public static File getGenerateExcelReportFile(String... reportTestNGPaths)
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-        return getGenerateExcelReportFile(reportTestNGPath, new File(
-                Paths.get(getDecodeAbsolutePath(generateReportPath), generateReportName + EXCEL_EXTENSION).toString()));
+        return getGenerateExcelReportFile(getGenerateReportFilePath(reportTestNGPaths[0], EXCEL_EXTENSION), reportTestNGPaths);
     }
 
-    private static File getGenerateExcelReportFile(String reportTestNGPath, File generateFile)
+    public static File getGenerateExcelReportFile(String generateReportPath, String generateReportName, String reportTestNGPaths)
+            throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
+        return getGenerateExcelReportFile(new File(
+                Paths.get(getDecodeAbsolutePath(generateReportPath), generateReportName + EXCEL_EXTENSION).toString()), reportTestNGPaths);
+    }
+
+    private static File getGenerateExcelReportFile(File generateFile, String... reportTestNGPaths)
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
         String message;
         try {
-            Map<String, List<String>> reportSummary = new HashMap<>();
-            reportSummary = getReportSummaryMap(reportTestNGPath, reportSummary);
+            List<String> failedTestNames = new ArrayList<>();
+            List<String> failedTestStacktrace = new ArrayList<>();
+            for (String reportTestNGPath : reportTestNGPaths) {
+                ReportPageParser reportPageParser = new ReportPageParser(reportTestNGPath);
+                failedTestNames.addAll(reportPageParser.getFailedTestsNames().stream().map(
+                        test -> test.replace(":", ".").replace("#", ".").replace("()", ""))
+                        .collect(Collectors.toList()));
+                failedTestStacktrace.addAll(reportPageParser.getFailedTestsStacktrace());
+            }
+            cleanDuplicates(failedTestNames, failedTestStacktrace);
+            fetchReportExcelSheet(failedTestNames, failedTestStacktrace);
+
+            Map<String, List<String>> reportSummary = SummaryReport.groupingTestReportSummary(failedTestNames, failedTestStacktrace);
             fetchSummaryExcelSheet(reportSummary);
+
             excelGenerator.createFile(generateFile);
             message = String.format(">>>>>>   Excel file PATH:   <<<<<<\n%s", generateFile.getPath());
             log.info(message);
@@ -95,13 +105,28 @@ public class RunTestNGResultsParserToXls {
         return generateFile;
     }
 
-    private static Map<String, List<String>> getReportSummaryMap(String reportTestNGPath, Map<String, List<String>> reportSummary) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
-        reportPageParser = new ReportPageParser(reportTestNGPath);
-        List<String> failedTestsNames = reportPageParser.getFailedTestsNames().stream().map(
-                test -> test.replace(":", ".").replace("#", ".")).collect(Collectors.toList());
-        List<String> failedTestsStacktrace = reportPageParser.getFailedTestsStacktrace();
-        fetchReportExcelSheet(failedTestsNames, failedTestsStacktrace);
-        return SummaryReport.groupingTestReportSummary(failedTestsNames, failedTestsStacktrace, reportSummary);
+    private static void cleanDuplicates(List<String> failedTestNames, List<String> failedTestStacktrace) {
+        Set<String> duplicatesFailedTestNames = findDuplicates(failedTestNames);
+        for (String duplicatesFailedTestName : duplicatesFailedTestNames) {
+            int index = failedTestNames.indexOf(duplicatesFailedTestName);
+            for (int i = index + 1; i < failedTestNames.size(); ++i) {
+                if (failedTestNames.get(i).equals(duplicatesFailedTestName)) {
+                    failedTestNames.remove(i);
+                    failedTestStacktrace.remove(i--);
+                }
+            }
+        }
+    }
+
+    private static Set<String> findDuplicates(List<String> listContainingDuplicates) {
+        final Set<String> duplicates = new HashSet<>();
+        final Set<String> checkingSet = new HashSet<>();
+        for (String item : listContainingDuplicates) {
+            if (!checkingSet.add(item)) {
+                duplicates.add(item);
+            }
+        }
+        return duplicates;
     }
 
     private static void fetchReportExcelSheet(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
