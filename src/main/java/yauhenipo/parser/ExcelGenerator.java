@@ -18,6 +18,10 @@ import java.util.List;
 public class ExcelGenerator {
 
     private XSSFWorkbook workbook = new XSSFWorkbook();
+    public static final String REPORT_SHEET = "report";
+    public static final String SUMMARY_SHEET = "summary";
+    public static final String EXCEL_EXTENSION = ".xlsx";
+
 
     public ExcelGenerator(String path) throws IOException, InvalidFormatException {
         OPCPackage pkg = OPCPackage.open(path);
@@ -31,11 +35,10 @@ public class ExcelGenerator {
             for (int columnNum = 0; columnNum < columnLists.length; ++columnNum) {
                 Cell cell = row.createCell(columnNum);
                 String cellData = columnLists[columnNum].get(rowNum);
-                boolean isNumericData = StringUtils.isNumeric(cellData);
-                if (isNumericData) {
+                if (StringUtils.isNumeric(cellData)) {
                     cell.setCellValue(Integer.parseInt(cellData));
                 } else {
-                    cell.setCellValue(columnLists[columnNum].get(rowNum));
+                    cell.setCellValue(cellData);
                 }
             }
         }

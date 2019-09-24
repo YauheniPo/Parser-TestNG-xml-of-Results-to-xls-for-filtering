@@ -25,7 +25,6 @@ public class RunTestNGResultsParserToXls {
 
     private static boolean isWindowRun = false;
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
-    private static final String EXCEL_EXTENSION = ".xlsx";
 
     public static void main(String[] args) {
         String msg = null;
@@ -66,13 +65,13 @@ public class RunTestNGResultsParserToXls {
 
     public static File getGenerateExcelReportFile(String... reportTestNGPaths)
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-        return getGenerateExcelReportFile(getGenerateReportFilePath(reportTestNGPaths[0], EXCEL_EXTENSION), reportTestNGPaths);
+        return getGenerateExcelReportFile(getGenerateReportFilePath(reportTestNGPaths[0], ExcelGenerator.EXCEL_EXTENSION), reportTestNGPaths);
     }
 
     public static File getGenerateExcelReportFile(String generateReportPath, String generateReportName, String reportTestNGPaths)
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
         return getGenerateExcelReportFile(new File(
-                Paths.get(getDecodeAbsolutePath(generateReportPath), generateReportName + EXCEL_EXTENSION).toString()), reportTestNGPaths);
+                Paths.get(getDecodeAbsolutePath(generateReportPath), generateReportName + ExcelGenerator.EXCEL_EXTENSION).toString()), reportTestNGPaths);
     }
 
     private static File getGenerateExcelReportFile(File generateFile, String... reportTestNGPaths)
@@ -91,7 +90,7 @@ public class RunTestNGResultsParserToXls {
             cleanDuplicates(failedTestNames, failedTestStacktrace);
             fetchReportExcelSheet(failedTestNames, failedTestStacktrace);
 
-            Map<String, List<String>> reportSummary = SummaryReport.groupingTestReportSummary(failedTestNames, failedTestStacktrace);
+            Map<String, List<String>> reportSummary = SummaryReport.groupFailedTests(failedTestNames, failedTestStacktrace);
             fetchSummaryExcelSheet(reportSummary);
 
             excelGenerator.createFile(generateFile);
@@ -130,33 +129,19 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static void fetchReportExcelSheet(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
-        excelGenerator.writeDataToExcelSheet("report", failedTestsNames, failedTestsStacktrace);
+        excelGenerator.writeDataToExcelSheet(ExcelGenerator.REPORT_SHEET, failedTestsNames, failedTestsStacktrace);
     }
 
-    private static void fetchSummaryExcelSheet(Map<String, List<String>> mapTests) {
-        Map<String, List<String>> sortedMapTests = getSortingSummaryMapByTestsFailed(mapTests);
-        List<String> failedMethods = new ArrayList<>(sortedMapTests.keySet());
-        List<String> countFailed = new ArrayList<>();
-        List<String> columnTestsCells = new ArrayList<>();
+    private static void fetchSummaryExcelSheet(Map<String, List<String>> reportSummaryMap) {
+        List<String> failedMethods = new ArrayList<>(reportSummaryMap.keySet());
+        List<String> failureCounts = new ArrayList<>();
+        List<String> failedTests = new ArrayList<>();
         for (String failedMethod : failedMethods) {
-            countFailed.add(String.valueOf(sortedMapTests.get(failedMethod).size()));
-            List<String> testsList = sortedMapTests.get(failedMethod);
-            columnTestsCells.add(String.join("\r\n", testsList));
+            List<String> testsList = reportSummaryMap.get(failedMethod);
+            failureCounts.add(String.valueOf(testsList.size()));
+            failedTests.add(String.join("\r\n", testsList));
         }
-        excelGenerator.writeDataToExcelSheet("summary", countFailed, failedMethods, columnTestsCells);
-    }
-
-    private static Map<String, List<String>> getSortingSummaryMapByTestsFailed(Map<String, List<String>> mapTests) {
-        return mapTests.entrySet().stream()
-                .sorted(Comparator.comparing(e -> e.getValue().size(), Comparator.reverseOrder()))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> {
-                            throw new AssertionError();
-                        },
-                        LinkedHashMap::new
-                ));
+        excelGenerator.writeDataToExcelSheet(ExcelGenerator.SUMMARY_SHEET, failureCounts, failedMethods, failedTests);
     }
 
     private static void openDesktopFile(File generateFile) {
