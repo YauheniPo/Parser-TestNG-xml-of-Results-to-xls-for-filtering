@@ -43,7 +43,8 @@ class SummaryReport {
     private static String getFailedMethod(String stackTrace) {
         List<String> stackTraceStringsList = Arrays.asList(stackTrace.split("\n"));
         // Get index of line in stacktrace, where test method is failing
-        String testFailureMethod = stackTraceStringsList.stream().filter(s -> s.contains("com.mscs.emr.test.functional.g2.pages.")).findFirst().orElse("");
+        String testFailureMethod = stackTraceStringsList.stream()
+                .filter(s -> s.contains("com.mscs.emr.test.functional.g2.pages.") || s.contains("com.mscs.emr.test.utils.")).findFirst().orElse("");
         return parseTestFailedMethodByRegExp(testFailureMethod);
     }
 

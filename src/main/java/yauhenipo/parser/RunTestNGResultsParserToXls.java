@@ -35,8 +35,7 @@ public class RunTestNGResultsParserToXls {
                 JFileChooser jFileChooser = viewFileChooser();
                 File file = jFileChooser.getSelectedFile();
                 if (file == null) {
-                    msg = ">>>>>>   Report file does not identify   <<<<<<";
-                    throw new NullPointerException(msg);
+                    throw new NullPointerException(">>>>>>   Report file does not identify   <<<<<<");
                 }
                 reportTestNGPath = file.getAbsolutePath();
                 try {
@@ -157,7 +156,7 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static void saveRemoteBasicReportFile(String originalFilePath) throws IOException {
-        if (originalFilePath.matches("((\\w*\\.\\w*)\\\\.)|((\\w*\\.\\w*)/.)")) {
+        if (originalFilePath.matches("[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?\\\\")) {
             FileUtils.copyFile(new File(originalFilePath),
                     new File(Paths.get(getParentSourceFilePath(), getFileName(originalFilePath)).toString()));
         }
