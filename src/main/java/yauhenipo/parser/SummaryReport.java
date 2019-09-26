@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 @Log4j2
 class SummaryReport {
 
-    private static final String NO_TEST_CASE_NAME_IN_STACKTRACE = "NO TEST CASE NAME IN STACKTRACE";
+    private static final String NO_TEST_CASE_NAME_IN_STACKTRACE = "THIS TYPE FAIL IS NOT SUPPORTED";
 
     /**
      * Grouping the common tests failures methods by the list of failures tests and by the list of stacktrace

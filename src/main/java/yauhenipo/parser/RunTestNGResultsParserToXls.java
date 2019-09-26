@@ -156,7 +156,7 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static void saveRemoteBasicReportFile(String originalFilePath) throws IOException {
-        if (originalFilePath.matches("[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?\\\\")) {
+        if ("[a-z0-9]+([\\\\-\\\\.]{1}[a-z0-9]+).com".matches(originalFilePath)) {
             FileUtils.copyFile(new File(originalFilePath),
                     new File(Paths.get(getParentSourceFilePath(), getFileName(originalFilePath)).toString()));
         }
@@ -179,7 +179,7 @@ public class RunTestNGResultsParserToXls {
         return jFileChooser;
     }
 
-    static void viewAlert(String message) {
+    private static void viewAlert(String message) {
         if (isWindowRun) {
             JOptionPane pane = new JOptionPane();
             pane.setMessage(message);
