@@ -156,9 +156,8 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static void saveRemoteBasicReportFile(String originalFilePath) throws IOException {
-        if ("[a-z0-9]+([\\\\-\\\\.]{1}[a-z0-9]+).com".matches(originalFilePath)) {
-            FileUtils.copyFile(new File(originalFilePath),
-                    new File(Paths.get(getParentSourceFilePath(), getFileName(originalFilePath)).toString()));
+        if (originalFilePath.contains("corp.mckesson.com")) {
+            FileUtils.copyFile(new File(originalFilePath), new File(getParentSourceFilePath(), FilenameUtils.getName(originalFilePath)));
         }
     }
 
@@ -190,11 +189,7 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static String getGenerateReportFileNameWithExtension(String reportTestNGPath, String extension) {
-        return getFileName(reportTestNGPath) + extension;
-    }
-
-    private static String getFileName(String file) {
-        return FilenameUtils.getBaseName(file);
+        return FilenameUtils.getBaseName(reportTestNGPath) + extension;
     }
 
     private static File getGenerateReportFilePath(String reportTestNGPath, String extension) throws UnsupportedEncodingException {
