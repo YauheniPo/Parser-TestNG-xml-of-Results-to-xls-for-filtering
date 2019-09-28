@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 @Log4j2
 class SummaryReport {
 
-    private static final String NO_TEST_CASE_NAME_IN_STACKTRACE = "THIS TYPE FAIL IS NOT SUPPORTED";
+    private static final String TYPE_FAIL_IS_NOT_SUPPORTED = "THIS TYPE FAIL IS NOT SUPPORTED";
 
     /**
      * Grouping the common tests failures methods by the list of failures tests and by the list of stacktrace
@@ -58,7 +58,7 @@ class SummaryReport {
         try {
             return m.group(1);
         } catch (IllegalStateException e) {
-            return NO_TEST_CASE_NAME_IN_STACKTRACE;
+            return TYPE_FAIL_IS_NOT_SUPPORTED;
         }
     }
 }

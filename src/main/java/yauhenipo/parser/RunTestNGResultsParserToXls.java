@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,24 +26,30 @@ public class RunTestNGResultsParserToXls {
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
 
     public static void main(String[] args) {
-        String msg = null;
-        String reportTestNGPath;
         try {
             if (args.length == 0) {
                 isWindowRun = true;
                 JFileChooser jFileChooser = viewFileChooser();
-                File file = jFileChooser.getSelectedFile();
-                if (file == null) {
-                    throw new NullPointerException(">>>>>>   Report file does not identify   <<<<<<");
+                progressBar();
+                File[] files = jFileChooser.getSelectedFiles();
+
+                if (files.length == 1) {
+                    File file = files[0];
+                    if (file.isFile()) {
+                        String reportTestNGPath = file.getAbsolutePath();
+                        try {
+                            saveRemoteBasicReportFile(reportTestNGPath);
+                        } catch (Exception e) {
+                            throw new RuntimeException(String.format("ERROR of saving TestNG report:\nPATH:\n%s", reportTestNGPath), e);
+                        }
+                    } else {
+                        files = files[0].listFiles();
+                    }
                 }
-                reportTestNGPath = file.getAbsolutePath();
-                try {
-                    saveRemoteBasicReportFile(reportTestNGPath);
-                } catch (Exception e) {
-                    msg = String.format("ERROR of saving TestNG report:\nPATH:\n%s\nERROR:\n%s", reportTestNGPath, ExceptionUtils.getStackTrace(e));
-                    throw e;
+                args = Arrays.stream(Objects.requireNonNull(files)).map(File::getAbsolutePath).filter(f -> f.endsWith(".html")).toArray(String[]::new);
+                if (args.length == 0) {
+                    throw new NullPointerException(String.format(">>>>>>   Report file does not identify! Files: %s   <<<<<<", Arrays.asList(files)));
                 }
-                args = new String[]{reportTestNGPath};
             }
 
             log.info(String.format(">>>>>>   Report file PATH:   <<<<<<\n%s", Arrays.toString(args)));
@@ -52,11 +57,7 @@ public class RunTestNGResultsParserToXls {
             File generateFile = getGenerateExcelReportFile(args);
             openDesktopFile(generateFile);
         } catch (Exception e) {
-            if (msg == null) {
-                msg = ExceptionUtils.getStackTrace(e);
-            }
-            log.error(msg);
-            viewAlert(msg);
+            viewAlert(ExceptionUtils.getStackTrace(e));
         } finally {
             System.exit(0);
         }
@@ -69,17 +70,16 @@ public class RunTestNGResultsParserToXls {
 
     public static File getGenerateExcelReportFile(String generateReportPath, String generateReportName, String reportTestNGPaths)
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-        return getGenerateExcelReportFile(new File(
-                Paths.get(getDecodeAbsolutePath(generateReportPath), generateReportName + ExcelGenerator.EXCEL_EXTENSION).toString()), reportTestNGPaths);
+        return getGenerateExcelReportFile(new File(getDecodeAbsolutePath(generateReportPath), generateReportName + ExcelGenerator.EXCEL_EXTENSION), reportTestNGPaths);
     }
 
     private static File getGenerateExcelReportFile(File generateFile, String... reportTestNGPaths)
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
-        String message;
         try {
             List<String> failedTestNames = new ArrayList<>();
             List<String> failedTestStacktrace = new ArrayList<>();
             for (String reportTestNGPath : reportTestNGPaths) {
+                log.info(String.format("Parsing: %s", reportTestNGPath));
                 ReportPageParser reportPageParser = new ReportPageParser(reportTestNGPath);
                 failedTestNames.addAll(reportPageParser.getFailedTestsNames().stream().map(
                         test -> test.replace(":", ".").replace("#", ".").replace("()", ""))
@@ -93,11 +93,9 @@ public class RunTestNGResultsParserToXls {
             fetchSummaryExcelSheet(reportSummary);
 
             excelGenerator.createFile(generateFile);
-            message = String.format(">>>>>>   Excel file PATH:   <<<<<<\n%s", generateFile.getPath());
-            log.info(message);
+            log.info(String.format(">>>>>>   Excel file PATH:   <<<<<<\n%s", generateFile.getPath()));
         } catch (FileNotFoundException fileNotFoundException) {
-            message = ExceptionUtils.getStackTrace(fileNotFoundException);
-            log.error(message);
+            log.error(fileNotFoundException);
             throw fileNotFoundException;
         }
         return generateFile;
@@ -148,9 +146,7 @@ public class RunTestNGResultsParserToXls {
             try {
                 Desktop.getDesktop().open(generateFile);
             } catch (IOException e) {
-                String msg = ExceptionUtils.getStackTrace(e);
-                log.error(msg);
-                viewAlert(String.format("Open desktop file:\n%s", msg));
+                viewAlert(String.format("Open desktop file:\n%s", ExceptionUtils.getStackTrace(e)));
             }
         }
     }
@@ -172,13 +168,32 @@ public class RunTestNGResultsParserToXls {
                 return dialog;
             }
         };
+        jFileChooser.setMultiSelectionEnabled(true);
+        jFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         jFileChooser.setDialogTitle("Choose a report");
         jFileChooser.setCurrentDirectory(new File(getSourcePath()));
         jFileChooser.showOpenDialog(null);
         return jFileChooser;
     }
 
+    private static void progressBar() {
+        final JFrame frame = new JFrame("Progress Bar");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel panel = new JPanel();
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        panel.add(progressBar);
+        frame.getContentPane().setLayout(new BorderLayout());
+        frame.getContentPane().add(panel, BorderLayout.CENTER);
+        frame.setPreferredSize(new Dimension(400, 70));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
     private static void viewAlert(String message) {
+        log.error(message);
+
         if (isWindowRun) {
             JOptionPane pane = new JOptionPane();
             pane.setMessage(message);
@@ -193,7 +208,7 @@ public class RunTestNGResultsParserToXls {
     }
 
     private static File getGenerateReportFilePath(String reportTestNGPath, String extension) throws UnsupportedEncodingException {
-        return new File(Paths.get(getParentSourceFilePath(), getGenerateReportFileNameWithExtension(reportTestNGPath, extension)).toString());
+        return new File(getParentSourceFilePath(), getGenerateReportFileNameWithExtension(reportTestNGPath, extension));
     }
 
     private static String getParentSourceFilePath() throws UnsupportedEncodingException {

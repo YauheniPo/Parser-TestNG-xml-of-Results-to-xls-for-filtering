@@ -6,7 +6,7 @@
 
     <groupId>ParseTestNGResultsXml</groupId>
     <artifactId>parse_testng_results</artifactId>
-    <version>3.2.2.YauheniPo</version>
+    <version>4.0.YauheniPo</version>
 
     <properties>
         <dir>${project.basedir}/jar</dir>
@@ -38,7 +38,7 @@
                 <version>0.11</version>
                 <configuration>
                     <message>Maven artifacts for ${project.version}</message>
-                    <!--<server>github</server>-->
+                    <server>github</server>
                     <noJekyll>true</noJekyll>
                     <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
                     <branch>refs/heads/mvn-repo</branch>

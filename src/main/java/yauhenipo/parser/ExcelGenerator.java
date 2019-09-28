@@ -19,14 +19,14 @@ public class ExcelGenerator {
 
     private XSSFWorkbook workbook = new XSSFWorkbook();
     public static final String REPORT_SHEET = "report";
-    public static final String SUMMARY_SHEET = "summary";
-    public static final String EXCEL_EXTENSION = ".xlsx";
-
+    static final String SUMMARY_SHEET = "summary";
+    static final String EXCEL_EXTENSION = ".xlsx";
 
     public ExcelGenerator(String path) throws IOException, InvalidFormatException {
         OPCPackage pkg = OPCPackage.open(path);
         workbook = new XSSFWorkbook(pkg);
     }
+
     @SafeVarargs
     final void writeDataToExcelSheet(String sheetName, List<String>... columnLists) {
         XSSFSheet sheet = workbook.createSheet(sheetName);
