@@ -10,9 +10,22 @@ mvn clean -DskipTests deploy
     for deploy to git repository
 
 ```
+<repositories>
+        <repository>
+            <id>dev-azure-com-yauhenipo-yaihenipo</id>
+            <url>https://pkgs.dev.azure.com/YauheniPo/_packaging/YaiheniPo/maven/v1</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
 <dependency>
-    <groupId>ParseTestNGResultsXml</groupId>
-    <artifactId>parse_testng_results</artifactId>
-    <version>3.2.YauheniPo</version>
-</dependency>
+            <groupId>ParseTestNGResultsXml</groupId>
+            <artifactId>parse_testng_results</artifactId>
+            <version>4.1.YauheniPo</version>
+        </dependency>
 ```
