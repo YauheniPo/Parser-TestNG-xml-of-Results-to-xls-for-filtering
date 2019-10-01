@@ -1,12 +1,17 @@
 [![Build Status](https://dev.azure.com/YauheniPo/WebTestFramework/_apis/build/status/YauheniPo.Parser-TestNG-xml-of-Results-to-xls-for-filtering?branchName=master)](https://dev.azure.com/YauheniPo/WebTestFramework/_build/latest?definitionId=9&branchName=master)
 
+[![ParseTestNGResultsXml:parse_testng_results package in YaiheniPo feed in Azure Artifacts](https://feeds.dev.azure.com/YauheniPo/_apis/public/Packaging/Feeds/325280d1-3c19-4f4d-b4bd-b0f686103d11/Packages/7124f50d-eea2-4f5c-a119-1e643d49e2bf/Badge)](https://dev.azure.com/YauheniPo/WebTestFramework/_packaging?_a=package&feed=325280d1-3c19-4f4d-b4bd-b0f686103d11&package=7124f50d-eea2-4f5c-a119-1e643d49e2bf&preferRelease=true)
+
+https://feeds.dev.azure.com/YauheniPo/_apis/public/Packaging/Feeds/325280d1-3c19-4f4d-b4bd-b0f686103d11/Packages/7124f50d-eea2-4f5c-a119-1e643d49e2bf/Badge
+
 # Parser-TestNG-xml-of-Results-to-xls-for-filtering
 Parser TestNG xml of Results to xls for filtering
 
 mvn clean package
     for getting runnable jar file
 
-mvn clean -DskipTests deploy
+mvn clean deploy
+    -DskipTests
     for deploy to git repository
 
 ```

@@ -6,7 +6,7 @@
 
     <groupId>ParseTestNGResultsXml</groupId>
     <artifactId>parse_testng_results</artifactId>
-    <version>4.1.YauheniPo</version>
+    <version>4.1.0.1.YauheniPo</version>
 
     <properties>
         <dir>${project.basedir}/jar</dir>
@@ -15,18 +15,18 @@
         <!--<github.global.server>github</github.global.server>-->
     </properties>
 
-    <repositories>
-        <repository>
-            <id>dev-azure-com-yauhenipo-yaihenipo</id>
-            <url>https://pkgs.dev.azure.com/YauheniPo/_packaging/YaiheniPo/maven/v1</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <!--<repositories>-->
+        <!--<repository>-->
+            <!--<id>dev-azure-com-yauhenipo-yaihenipo</id>-->
+            <!--<url>https://pkgs.dev.azure.com/YauheniPo/_packaging/YaiheniPo/maven/v1</url>-->
+            <!--<releases>-->
+                <!--<enabled>true</enabled>-->
+            <!--</releases>-->
+            <!--<snapshots>-->
+                <!--<enabled>true</enabled>-->
+            <!--</snapshots>-->
+        <!--</repository>-->
+    <!--</repositories>-->
 
     <distributionManagement>
         <repository>
@@ -67,20 +67,20 @@
                     <!--</execution>-->
                 <!--</executions>-->
             <!--</plugin>-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>yauhenipo.parser.RunTestNGResultsParserToXls</mainClass>
-                            <classpathPrefix>jars/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-jar-plugin</artifactId>-->
+                <!--<version>3.1.1</version>-->
+                <!--<configuration>-->
+                    <!--<archive>-->
+                        <!--<manifest>-->
+                            <!--<addClasspath>true</addClasspath>-->
+                            <!--<mainClass>yauhenipo.parser.RunTestNGResultsParserToXls</mainClass>-->
+                            <!--<classpathPrefix>jars/</classpathPrefix>-->
+                        <!--</manifest>-->
+                    <!--</archive>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
