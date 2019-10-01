@@ -2,7 +2,6 @@
 
 [![ParseTestNGResultsXml:parse_testng_results package in YaiheniPo feed in Azure Artifacts](https://feeds.dev.azure.com/YauheniPo/_apis/public/Packaging/Feeds/325280d1-3c19-4f4d-b4bd-b0f686103d11/Packages/7124f50d-eea2-4f5c-a119-1e643d49e2bf/Badge)](https://dev.azure.com/YauheniPo/WebTestFramework/_packaging?_a=package&feed=325280d1-3c19-4f4d-b4bd-b0f686103d11&package=7124f50d-eea2-4f5c-a119-1e643d49e2bf&preferRelease=true)
 
-https://feeds.dev.azure.com/YauheniPo/_apis/public/Packaging/Feeds/325280d1-3c19-4f4d-b4bd-b0f686103d11/Packages/7124f50d-eea2-4f5c-a119-1e643d49e2bf/Badge
 
 # Parser-TestNG-xml-of-Results-to-xls-for-filtering
 Parser TestNG xml of Results to xls for filtering
@@ -14,23 +13,48 @@ mvn clean deploy
     -DskipTests
     for deploy to git repository
 
+pom.xml
 ```
 <repositories>
-        <repository>
-            <id>dev-azure-com-yauhenipo-yaihenipo</id>
-            <url>https://pkgs.dev.azure.com/YauheniPo/_packaging/YaiheniPo/maven/v1</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <repository>
+        <id>dev-azure-com-yauhenipo-yaihenipo</id>
+        <url>https://pkgs.dev.azure.com/YauheniPo/_packaging/YaiheniPo/maven/v1</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+</repositories>
 
 <dependency>
-            <groupId>ParseTestNGResultsXml</groupId>
-            <artifactId>parse_testng_results</artifactId>
-            <version>4.1.YauheniPo</version>
-        </dependency>
+    <groupId>ParseTestNGResultsXml</groupId>
+    <artifactId>parse_testng_results</artifactId>
+    <version>4.1.0.1.YauheniPo</version>
+</dependency>
+```
+
+.m/settings.xml:
+```
+<profiles>
+    <profile>
+	    <id>dev-azure-com-yauhenipo-yaihenipo</id>
+        <repositories>
+            <repository>
+                <url>https://pkgs.dev.azure.com/YauheniPo/_packaging/YaiheniPo/maven/v1</url>
+                <releases>
+                    <enabled>true</enabled>
+                </releases>
+                <snapshots>
+                    <enabled>true</enabled>
+                </snapshots>
+            </repository>
+        </repositories>
+	</profile>
+</profiles>
+
+<activeProfiles>
+	<activeProfile>dev-azure-com-yauhenipo-yaihenipo</activeProfile>
+</activeProfiles>
 ```
