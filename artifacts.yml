@@ -1,3 +1,4 @@
+jobs:
 - job: Artifacts
   steps:
   - task: PublishBuildArtifacts@1
