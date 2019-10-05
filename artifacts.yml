@@ -1,4 +1,5 @@
-steps:
+- job: Artifacts
+  steps:
   - task: PublishBuildArtifacts@1
     displayName: Publish Build Artifacts
     inputs:

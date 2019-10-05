@@ -27,7 +27,7 @@ jobs:
       testResultsFiles: '**/TEST-*.xml'
       goals: 'clean package'
 
-  - template: artifacts.yml
-
   - script: ls
     displayName: $(vmImageVar) env
+
+- template: artifacts.yml
