@@ -26,14 +26,15 @@ public class RunTestNGResultsParserToXls {
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
 
     public static void main(String[] args) {
+        File[] files = new File[0];
         try {
             if (args.length == 0) {
                 isWindowRun = true;
                 JFileChooser jFileChooser = viewFileChooser();
                 progressBar();
-                File[] files = jFileChooser.getSelectedFiles();
+                files = jFileChooser.getSelectedFiles();
 
-                if (files.length == 1) {
+                if (Objects.requireNonNull(files).length == 1) {
                     File file = files[0];
                     if (file.isFile()) {
                         String reportTestNGPath = file.getAbsolutePath();
@@ -46,11 +47,19 @@ public class RunTestNGResultsParserToXls {
                         files = files[0].listFiles();
                     }
                 }
-                args = Arrays.stream(Objects.requireNonNull(files)).map(File::getAbsolutePath).filter(f -> f.endsWith(".html")).toArray(String[]::new);
-                if (args.length == 0) {
-                    throw new NullPointerException(String.format(">>>>>>   Report file does not identify! Files: %s   <<<<<<", Arrays.asList(files)));
+            }
+            if (args.length == 1) {
+                File file = new File(args[0]);
+                if (file.isDirectory()) {
+                    files = file.listFiles();
                 }
             }
+
+            args = files.length == 0 ? args : Arrays.stream(files).map(File::getAbsolutePath).filter(f -> f.endsWith(".html")).toArray(String[]::new);
+            if (args.length == 0) {
+                throw new NullPointerException(String.format(">>>>>>   Report file does not identify! Files: %s   <<<<<<", Arrays.asList(files)));
+            }
+
 
             log.info(String.format(">>>>>>   Report file PATH:   <<<<<<\n%s", Arrays.toString(args)));
 

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 @Log4j2
 class SummaryReport {
 
-    private static final String TYPE_FAIL_IS_NOT_SUPPORTED = "THIS TYPE FAIL IS NOT SUPPORTED";
+    private static final String TYPE_FAIL_IS_NOT_SUPPORTED = "THIS TYPE OF FAIL IS NOT SUPPORTED";
 
     /**
      * Grouping the common tests failures methods by the list of failures tests and by the list of stacktrace
