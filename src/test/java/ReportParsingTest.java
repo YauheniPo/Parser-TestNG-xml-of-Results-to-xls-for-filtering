@@ -14,6 +14,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * The type Report parsing test.
+ * @author Yauheni Papovich
+ */
 public class ReportParsingTest {
 
     private static final String TEST_REPORT_FILE_NAME = "report.html";

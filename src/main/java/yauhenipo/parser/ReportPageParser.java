@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 /**
  * Class for parsing HTML file by XPATH
+ * @author Yauheni Papovich
  */
 class ReportPageParser {
 

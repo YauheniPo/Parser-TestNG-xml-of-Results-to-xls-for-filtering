@@ -14,6 +14,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * The type Excel generator.
+ * @author Yauheni Papovich
+ */
 @NoArgsConstructor
 public class ExcelGenerator {
 

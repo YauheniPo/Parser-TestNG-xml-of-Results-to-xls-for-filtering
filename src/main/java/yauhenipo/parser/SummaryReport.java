@@ -6,6 +6,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The type Summary report.
+ * @author Yauheni Papovich
+ */
 @Log4j2
 class SummaryReport {
 

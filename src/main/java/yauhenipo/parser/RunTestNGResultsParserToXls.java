@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The type Run test ng results parser to xls.
+ *
+ * @author Yauheni Papovich
+ */
 @Log4j2
 public class RunTestNGResultsParserToXls {
 
@@ -26,36 +31,29 @@ public class RunTestNGResultsParserToXls {
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
 
     public static void main(String[] args) {
-        File[] files = new File[0];
+        File[] files = Arrays.stream(args).map(File::new).toArray(File[]::new);
         try {
-            if (args.length == 0) {
+            if (files.length == 0) {
                 isWindowRun = true;
                 JFileChooser jFileChooser = viewFileChooser();
                 progressBar();
                 files = jFileChooser.getSelectedFiles();
-
-                if (Objects.requireNonNull(files).length == 1) {
-                    File file = files[0];
-                    if (file.isFile()) {
-                        String reportTestNGPath = file.getAbsolutePath();
-                        try {
-                            saveRemoteBasicReportFile(reportTestNGPath);
-                        } catch (Exception e) {
-                            throw new RuntimeException(String.format("ERROR of saving TestNG report:\nPATH:\n%s", reportTestNGPath), e);
-                        }
-                    } else {
-                        files = files[0].listFiles();
+            }
+            if (files.length == 1) {
+                File file = files[0];
+                if (file.isFile()) {
+                    String reportTestNGPath = file.getAbsolutePath();
+                    try {
+                        saveRemoteBasicReportFile(reportTestNGPath);
+                    } catch (Exception e) {
+                        throw new RuntimeException(String.format("ERROR of saving TestNG report:\nPATH:\n%s", reportTestNGPath), e);
                     }
-                }
-            }
-            if (args.length == 1) {
-                File file = new File(args[0]);
-                if (file.isDirectory()) {
-                    files = file.listFiles();
+                } else {
+                    files = files[0].listFiles();
                 }
             }
 
-            args = files.length == 0 ? args : Arrays.stream(files).map(File::getAbsolutePath).filter(f -> f.endsWith(".html")).toArray(String[]::new);
+            args = Arrays.stream(Objects.requireNonNull(files)).map(File::getAbsolutePath).filter(f -> f.endsWith(".html")).toArray(String[]::new);
             if (args.length == 0) {
                 throw new NullPointerException(String.format(">>>>>>   Report file does not identify! Files: %s   <<<<<<", Arrays.asList(files)));
             }
