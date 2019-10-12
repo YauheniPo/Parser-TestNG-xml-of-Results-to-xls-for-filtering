@@ -5,5 +5,5 @@ jobs:
     runs-on: windows-2019
     steps:
       - name: Package
-        run: mvn clean package
+        run: mvn clean test
         shell: bash
