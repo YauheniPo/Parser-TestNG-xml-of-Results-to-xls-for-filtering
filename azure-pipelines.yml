@@ -25,9 +25,9 @@ jobs:
           jdkArchitectureOption: 'x64'
           publishJUnitResults: true
           testResultsFiles: '**/TEST-*.xml'
-          goals: '--settings settings-parser-project.xml -DAZURE_ARTIFACTS_USERNAME=$(AZURE_ARTIFACTS_USERNAME) -DAZURE_ARTIFACTS_TOKEN=$(AZURE_ARTIFACTS_TOKEN) clean package'
+          goals: '--settings .github/settings-parser-project.xml -Denv.AZURE_ARTIFACTS_USERNAME=$(AZURE_ARTIFACTS_USERNAME) -Denv.AZURE_ARTIFACTS_TOKEN=$(AZURE_ARTIFACTS_TOKEN) clean package'
 
       - script: ls
         displayName: $(vmImageVar) env
 
-  - template: artifacts.yml
+      - template: artifacts.yml

@@ -1,5 +1,4 @@
-steps:
-  - task: PublishPipelineArtifact@1
-    inputs:
-      targetPath: '$(System.DefaultWorkingDirectory)/jar'
-      artifact: 'jar'
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(System.DefaultWorkingDirectory)/jar'
+    artifact: 'jar'
