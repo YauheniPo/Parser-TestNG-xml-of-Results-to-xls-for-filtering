@@ -1,18 +1,5 @@
-jobs:
-- job: Artifacts
-  steps:
-  - task: PublishBuildArtifacts@1
-    displayName: Publish Build Artifacts
+steps:
+  - task: PublishPipelineArtifact@1
     inputs:
-      PathtoPublish: '$(System.DefaultWorkingDirectory)'
-      ArtifactName: 'PublishBuildArtifacts'
-
-  - task: PublishPipelineArtifact@0
-    inputs:
-      artifactName: 'PublishPipelineArtifact'
-      targetPath: '$(System.DefaultWorkingDirectory)'
-
-#  - task: PublishPipelineArtifact@1
-#    inputs:
-#      targetPath: '$(System.DefaultWorkingDirectory)/jar'
-#      artifact: 'jar'
+      targetPath: '$(System.DefaultWorkingDirectory)/jar'
+      artifact: 'jar'
