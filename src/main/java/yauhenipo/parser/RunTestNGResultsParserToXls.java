@@ -1,5 +1,6 @@
 package yauhenipo.parser;
 
+import epam.popovich.annotation.time.TrackTime;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.xml.sax.SAXException;
 import lombok.extern.log4j.Log4j2;
@@ -31,6 +32,8 @@ public class RunTestNGResultsParserToXls {
     private static ExcelGenerator excelGenerator = new ExcelGenerator();
 
     public static void main(String[] args) {
+        System.out.println(String.format("ARGS: %s", Arrays.asList(args)));
+
         File[] files = Arrays.stream(args).map(File::new).toArray(File[]::new);
         try {
             if (files.length == 0) {
@@ -80,6 +83,7 @@ public class RunTestNGResultsParserToXls {
         return getGenerateExcelReportFile(new File(getDecodeAbsolutePath(generateReportPath), generateReportName + ExcelGenerator.EXCEL_EXTENSION), reportTestNGPaths);
     }
 
+    @TrackTime
     private static File getGenerateExcelReportFile(File generateFile, String... reportTestNGPaths)
             throws IOException, ParserConfigurationException, SAXException, XPathExpressionException {
         try {

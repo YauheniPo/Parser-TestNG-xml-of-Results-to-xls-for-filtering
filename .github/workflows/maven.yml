@@ -1,11 +1,11 @@
-name: Java CI - Test
+name: GitHub Actions CI - Package
 
 on: [push, pull_request]
 
 jobs:
   test:
 
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }}
+    name: Package on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -19,3 +19,13 @@ jobs:
         java-version: 1.8
     - name: Package with Maven
       run: mvn package --file pom.xml
+
+    - uses: actions/upload-artifact@v1
+      with:
+        name: artifacts
+        path: jars
+
+    - uses: actions/download-artifact@master
+      with:
+        name: jar
+        path: artifacts
