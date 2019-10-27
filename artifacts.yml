@@ -1,4 +1,6 @@
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: '$(System.DefaultWorkingDirectory)/jar'
-    artifact: 'jar'
+# File template: artifacts.yml
+steps:
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(System.DefaultWorkingDirectory)/jar'
+      artifact: 'jar'
