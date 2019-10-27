@@ -14,6 +14,9 @@ jobs:
   steps:
   - script: ls
     displayName: ls command
+    env:
+      AZURE_ARTIFACTS_USERNAME: $(AZURE_ARTIFACTS_USERNAME)
+      AZURE_ARTIFACTS_TOKEN: $(AZURE_ARTIFACTS_TOKEN)
 
   - task: Maven@3
     displayName: Maven Package
@@ -26,9 +29,6 @@ jobs:
       publishJUnitResults: true
       testResultsFiles: '**/TEST-*.xml'
       goals: '--settings settings-parser-project.xml clean package'
-    env:
-      AZURE_ARTIFACTS_USERNAME: $(AZURE_ARTIFACTS_USERNAME)
-      AZURE_ARTIFACTS_TOKEN: $(AZURE_ARTIFACTS_TOKEN)
 
   - script: ls
     displayName: $(vmImageVar) env
