@@ -4,33 +4,33 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 jobs:
-- job: TestNGReportParsingTest
-  pool:
-    vmImage: $(vmImageVar)
-#    vmImage: 'vs2017-win2016'
-#    vmImage: 'Ubuntu 16.04'
-#    vmImage: 'macOS-10.13'
+  - job: TestNGReportParsingTest
+    pool:
+      vmImage: $(vmImageVar)
+    #    vmImage: 'vs2017-win2016'
+    #    vmImage: 'Ubuntu 16.04'
+    #    vmImage: 'macOS-10.13'
 
-  steps:
-  - script: ls
-    displayName: ls command
+    steps:
+      - script: ls
+        displayName: ls command
 
-  - task: Maven@3
-    displayName: Maven Package
-    inputs:
-      mavenPomFile: 'pom.xml'
-      mavenOptions: '-Xmx3072m'
-      javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.8'
-      jdkArchitectureOption: 'x64'
-      publishJUnitResults: true
-      testResultsFiles: '**/TEST-*.xml'
-      goals: '--settings settings-parser-project.xml clean package'
-    env:
-      AZURE_ARTIFACTS_USERNAME: $(AZURE_ARTIFACTS_USERNAME)
-      AZURE_ARTIFACTS_TOKEN: $(AZURE_ARTIFACTS_TOKEN)
+      - task: Maven@3
+        displayName: Maven Package
+        inputs:
+          mavenPomFile: 'pom.xml'
+          mavenOptions: '-Xmx3072m'
+          javaHomeOption: 'JDKVersion'
+          jdkVersionOption: '1.8'
+          jdkArchitectureOption: 'x64'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          goals: '--settings settings-parser-project.xml -DAZURE_ARTIFACTS_USERNAME=$(AZURE_ARTIFACTS_USERNAME) -DAZURE_ARTIFACTS_TOKEN=$(AZURE_ARTIFACTS_TOKEN) clean package'
+        env:
+          AZURE_ARTIFACTS_USERNAME: $(AZURE_ARTIFACTS_USERNAME)
+          AZURE_ARTIFACTS_TOKEN: $(AZURE_ARTIFACTS_TOKEN)
 
-  - script: ls
-    displayName: $(vmImageVar) env
+      - script: ls
+        displayName: $(vmImageVar) env
 
-- template: artifacts.yml
+  - template: artifacts.yml
