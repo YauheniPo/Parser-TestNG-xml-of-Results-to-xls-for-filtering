@@ -29,9 +29,9 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
         name: artifacts
-        path: jar
+        path: jar/
 
     - uses: actions/download-artifact@master
       with:
-        name: artifacts
+        name: jar
         path: artifacts
