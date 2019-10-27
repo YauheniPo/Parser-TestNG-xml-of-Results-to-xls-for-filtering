@@ -18,7 +18,10 @@ jobs:
       with:
         java-version: 1.8
     - name: Package with Maven
-      run: mvn package --file pom.xml
+      env:
+        AZURE_ARTIFACTS_USERNAME: ${{ secrets.AZURE_ARTIFACTS_USERNAME }}
+        AZURE_ARTIFACTS_TOKEN: ${{ secrets.AZURE_ARTIFACTS_TOKEN }}
+      run: mvn --settings .github/settings-parser-project.xml package --file pom.xml
 
     - uses: actions/upload-artifact@v1
       with:
