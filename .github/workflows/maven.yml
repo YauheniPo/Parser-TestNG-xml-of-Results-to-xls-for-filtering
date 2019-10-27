@@ -26,12 +26,7 @@ jobs:
     - name: Show build files
       run: ls
 
-    - uses: actions/upload-artifact@v1
-      with:
-        name: artifacts
-        path: jar
-
     - uses: actions/download-artifact@master
       with:
         name: jar
-        path: artifacts
+        path: jar
