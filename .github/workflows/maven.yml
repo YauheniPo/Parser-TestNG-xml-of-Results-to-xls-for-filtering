@@ -23,12 +23,14 @@ jobs:
         AZURE_ARTIFACTS_TOKEN: ${{ secrets.AZURE_ARTIFACTS_TOKEN }}
       run: mvn --settings .github/settings-parser-project.xml package --file pom.xml
 
+    - name: Show build files
+      run: ls
+
     - uses: actions/upload-artifact@v1
       with:
         name: artifacts
-        path: jars
 
     - uses: actions/download-artifact@master
       with:
         name: jar
-        path: artifacts
+        path: artifacts/jars
