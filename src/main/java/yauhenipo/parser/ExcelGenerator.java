@@ -42,7 +42,7 @@ public class ExcelGenerator {
                 if (StringUtils.isNumeric(cellData)) {
                     cell.setCellValue(Integer.parseInt(cellData));
                 } else {
-                    cell.setCellValue(cellData);
+                    cell.setCellValue(StringUtils.substring(cellData, 0, 32767));
                 }
             }
         }
