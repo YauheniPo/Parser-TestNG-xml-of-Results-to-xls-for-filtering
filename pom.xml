@@ -27,7 +27,12 @@
             </snapshots>
         </repository>
     </repositories>
-
+    <distributionManagement>
+        <repository>
+            <id>dev-azure-com-yauhenipo-yaihenipo</id>
+            <url>https://pkgs.dev.azure.com/YauheniPo/_packaging/YaiheniPo/maven/v1</url>
+        </repository>
+    </distributionManagement>
     <build>
         <plugins>
             <!--<plugin>-->
