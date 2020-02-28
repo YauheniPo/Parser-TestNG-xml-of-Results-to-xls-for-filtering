@@ -1,11 +1,11 @@
 package yauhenipo.parser;
 
 import epam.popovich.annotation.time.TrackTime;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.xml.sax.SAXException;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;

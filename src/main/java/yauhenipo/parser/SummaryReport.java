@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 /**
  * The type Summary report.
+ *
  * @author Yauheni Papovich
  */
 @Log4j2
@@ -17,6 +18,7 @@ class SummaryReport {
 
     /**
      * Grouping the common tests failures methods by the list of failures tests and by the list of stacktrace
+     *
      * @return Data Map where key is common test failure method and value is a list of tests failures
      */
     static Map<String, List<String>> groupFailedTests(List<String> failedTestsNames, List<String> failedTestsStacktrace) {
@@ -44,11 +46,14 @@ class SummaryReport {
         return sortSummaryMap;
     }
 
-    private static String getFailedMethod(String stackTrace) {
-        List<String> stackTraceStringsList = Arrays.asList(stackTrace.split("\n"));
+    private static String getFailedMethod(String failStackTrace) {
+        List<String> stackTraceStringsList = Arrays.asList(failStackTrace.split("\n"));
         // Get index of line in stacktrace, where test method is failing
+        PropertyReader propertyReader = new PropertyReader();
         String testFailureMethod = stackTraceStringsList.stream()
-                .filter(s -> s.contains("com.mscs.emr.test.functional.g2.pages.") || s.contains("com.mscs.emr.test.utils.")).findFirst().orElse("");
+                .filter(stackTraceLine ->
+                        propertyReader.getAllKeys().stream().anyMatch(mark -> stackTraceLine.contains((CharSequence) mark))
+                ).findFirst().orElse("");
         return parseTestFailedMethodByRegExp(testFailureMethod);
     }
 
