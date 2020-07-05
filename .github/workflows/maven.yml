@@ -30,8 +30,3 @@ jobs:
       with:
         name: jar
         path: jar/
-
-    - uses: actions/download-artifact@master
-      with:
-        name: jar
-        path: jar/

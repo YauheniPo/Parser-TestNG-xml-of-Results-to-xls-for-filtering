@@ -3,7 +3,7 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
-            <id>dev-azure-com-yauhenipo-track_time</id>
+            <id>dev-azure-com-yauhenipo-yaihenipo</id>
             <username>${env.AZURE_ARTIFACTS_USERNAME}</username>
             <password>${env.AZURE_ARTIFACTS_TOKEN}</password>
         </server>
