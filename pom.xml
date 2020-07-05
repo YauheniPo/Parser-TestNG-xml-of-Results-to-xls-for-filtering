@@ -6,7 +6,7 @@
 
     <groupId>ParseTestNGResultsXml</groupId>
     <artifactId>parse_testng_results</artifactId>
-    <version>4.2.1.YauheniPo</version>
+    <version>4.2.2.YauheniPo</version>
 
     <properties>
         <dir>${project.basedir}/jar</dir>
@@ -33,6 +33,13 @@
             <url>https://pkgs.dev.azure.com/YauheniPo/_packaging/YaiheniPo/maven/v1</url>
         </repository>
     </distributionManagement>
+    <!--<distributionManagement>-->
+        <!--<repository>-->
+            <!--<id>github</id>-->
+            <!--<name>parse_testng_results</name>-->
+            <!--<url>https://maven.pkg.github.com/YauheniPo/Parser-TestNG-xml-of-Results-to-xls-for-filtering</url>-->
+        <!--</repository>-->
+    <!--</distributionManagement>-->
     <build>
         <plugins>
             <!--<plugin>-->

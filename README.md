@@ -9,7 +9,7 @@ Parser TestNG xml of Results to xls for filtering
 mvn clean package
     for getting runnable jar file
 
-mvn clean deploy
+mvn clean deploy  / -Dregistry=https://maven.pkg.github.com/YauheniPo -Dtoken=GH_TOKEN /
     -DskipTests
     for deploy to git repository
 
@@ -57,4 +57,22 @@ pom.xml
 <activeProfiles>
 	<activeProfile>dev-azure-com-yauhenipo-yaihenipo</activeProfile>
 </activeProfiles>
+
+
+<activeProfiles>
+    <activeProfile>github</activeProfile>
+</activeProfiles>
+
+  <profiles>
+    <profile>
+      <id>github</id>
+      <repositories>
+        <repository>
+          <id>github</id>
+          <name>parse_testng_results</name>
+          <url>https://maven.pkg.github.com/YauheniPo/Parser-TestNG-xml-of-Results-to-xls-for-filtering</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
 ```
